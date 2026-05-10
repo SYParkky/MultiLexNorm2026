@@ -89,7 +89,7 @@ def main():
         per_device_train_batch_size=BATCH_SIZE,
         per_device_eval_batch_size=BATCH_SIZE,
         learning_rate=LR,
-        evaluation_strategy="epoch",
+        eval_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
         predict_with_generate=True,
