@@ -93,7 +93,8 @@ def main():
         save_strategy="epoch",
         load_best_model_at_end=True,
         predict_with_generate=True,
-        fp16=torch.cuda.is_available(),
+        fp16=False,
+        bf16=torch.cuda.is_available(),
         logging_steps=200,
         report_to="none",
     )
