@@ -34,7 +34,7 @@ def build_token_pairs(split):
     raw == norm인 경우(정규화 불필요)도 포함 —
     모델이 '건드리지 말아야 할 것'도 학습하게.
     """
-    pub_data = load_dataset("weerayut/multilexnorm2026-pub")
+    pub_data = load_dataset("weerayut/multilexnorm2026-dev-pub")
     data = pub_data[split]
 
     inputs, targets = [], []
