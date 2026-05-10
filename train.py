@@ -88,7 +88,7 @@ def main():
         num_train_epochs=NUM_EPOCHS,
         per_device_train_batch_size=BATCH_SIZE,
         per_device_eval_batch_size=BATCH_SIZE,
-        gradient_accumulation_steps=4
+        gradient_accumulation_steps=4,
         learning_rate=LR,
         eval_strategy="epoch",
         save_strategy="epoch",
