@@ -19,7 +19,7 @@ MODEL_NAME     = "google/byt5-small"
 OUTPUT_DIR     = "./byt5-multilexnorm"
 MAX_INPUT_LEN  = 64    # 토큰 하나라서 짧아도 충분
 MAX_TARGET_LEN = 64
-BATCH_SIZE     = 64    # 토큰 단위라 샘플 수 많아짐 → 배치 크게
+BATCH_SIZE     = 32    
 NUM_EPOCHS     = 3
 LR             = 5e-4
 # ─────────────────────────────────────────────────────────
