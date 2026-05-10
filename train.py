@@ -20,7 +20,7 @@ OUTPUT_DIR     = "./byt5-multilexnorm"
 MAX_INPUT_LEN  = 64    # 토큰 하나라서 짧아도 충분
 MAX_TARGET_LEN = 64
 BATCH_SIZE     = 32    
-NUM_EPOCHS     = 3
+NUM_EPOCHS     = 1
 LR             = 5e-4
 # ─────────────────────────────────────────────────────────
 
@@ -88,6 +88,7 @@ def main():
         num_train_epochs=NUM_EPOCHS,
         per_device_train_batch_size=BATCH_SIZE,
         per_device_eval_batch_size=BATCH_SIZE,
+        gradient_accumulation_steps=4
         learning_rate=LR,
         eval_strategy="epoch",
         save_strategy="epoch",
