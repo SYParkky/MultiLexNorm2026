@@ -83,5 +83,5 @@ zip_path = f"{SAVE_PATH}.zip"
 with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
     zipf.write(f"{SAVE_PATH}/predictions.json", arcname="predictions.json")
 print(f"\nCreated: {zip_path}")
-print(f"\n✅ Upload to CodaBench:")
-print(f"   https://www.codabench.org/competitions/14162/?secret_key=33d4b8ec-4951-478b-8132-474e458409c3")#change key
+
+
