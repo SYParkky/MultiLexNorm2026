@@ -1,5 +1,5 @@
 """
-augment_wiki.py — Wikipedia Corruption Augmentation 
+augment_wiki.py — Wikipedia Corruption Augmentation
 Generates synthetic (noisy_input, clean_target) pairs for lexical normalization.
 
 Output format matches finetune_byt5-base.py:
@@ -123,8 +123,10 @@ def ko_trail_jamo(w):
     last = w[-1]
     d = _decompose_hangul(last)
     if d:
-        # if there's a 종성, use it; otherwise use the 중성 (vowel)
-        trail = d[2] if d[2] else d[1]
+        # d = 초성 + 중성 + 종성 (종성은 없으면 빈 문자열 '')
+        jong = d[2:]   # 종성 (빈 문자열일 수 있음)
+        jung = d[1]    # 중성 (항상 존재)
+        trail = jong if jong else jung
         return w + trail
     # non-Hangul: just append the last character as-is
     return w + last
