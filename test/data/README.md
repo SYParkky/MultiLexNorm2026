@@ -36,25 +36,22 @@ python data/augment_wiki.py --langs ko en --samples 3000 --output data/wiki_aug.
 | `--variants` | `3` | Corruption variants per word |
 | `--output` | `data/wiki_aug.jsonl` | Output file path |
 
-### 3. Merge with training data
-
-In `finetune_byt5-base.py`, find this line:
-```python
-train_flat = flatten(dataset['train'])
-```
-
-Add right below it:
-```python
-from datasets import concatenate_datasets
-
-wiki_aug   = load_dataset('json', data_files='data/wiki_aug.jsonl', split='train')
-train_flat = concatenate_datasets([train_flat, wiki_aug])
-```
-
-Then clear the cache so it re-tokenizes:
+### 3. Run training
+ 
+`finetune_byt5-base-wiki.py` already includes wiki augmentation — no manual changes needed.
+ 
+Just make sure `wiki_aug.jsonl` exists before training, then clear the cache and run:
+ 
 ```bash
+# Clear cache so it re-tokenizes with augmented data
 rm -rf ./data/cached/
+ 
+# Train
+python train/finetune_byt5-base-wiki.py
 ```
+ 
+> ⚠️ If `wiki_aug.jsonl` is not found, training will continue with the original data only and print a warning.
+ 
 
 ---
 
