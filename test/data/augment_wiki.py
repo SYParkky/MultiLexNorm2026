@@ -232,10 +232,10 @@ LANG_CONFIG = {
 }
 
 WIKI_CONFIG = {
-    'ko': ('wikipedia', '20231101.ko'),
-    'ja': ('wikipedia', '20231101.ja'),
-    'en': ('wikipedia', '20231101.en'),
-    'de': ('wikipedia', '20231101.de'),
+    'ko': ('wikimedia/wikipedia', '20231101.ko'),
+    'ja': ('wikimedia/wikipedia', '20231101.ja'),
+    'en': ('wikimedia/wikipedia', '20231101.en'),
+    'de': ('wikimedia/wikipedia', '20231101.de'),
 }
 
 def corrupt(word, lang):
