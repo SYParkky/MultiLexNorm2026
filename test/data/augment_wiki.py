@@ -187,7 +187,7 @@ def en_repeat_vowel(w):
     indices = [i for i, c in enumerate(w) if c in VOWELS]
     if indices:
         i = random.choice(indices)
-        return w[:i] + w[i] * random.randint(2, 4) + w[i+1:]
+        return w[:i] + w[i] * random.randint(2, 3) + w[i+1:]
     return w
 
 def en_lowercase(w):    return w.lower()
