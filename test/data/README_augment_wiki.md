@@ -1,0 +1,224 @@
+# augment_wiki.py — Wikipedia Corruption Augmentation
+
+Generates synthetic `(noisy input → clean target)` training pairs from Wikipedia text.
+Part of the **MultiLexNorm 2026** project — SKKU AI Introduction (Spring 2026).
+
+---
+
+## Quick Start
+
+### 1. Install dependencies
+```bash
+pip install datasets konlpy fugashi unidic-lite
+```
+
+KoNLPy requires Java — check if you have it:
+```bash
+java -version
+```
+If not:
+```bash
+brew install java   # macOS
+```
+
+### 2. Run
+```bash
+# Default: ko + ja + en + de, 5000 pairs each
+python data/augment_wiki.py
+
+# Custom languages and sample size
+python data/augment_wiki.py --langs ko en --samples 3000 --output data/wiki_aug.jsonl
+```
+
+| Argument | Default | Description |
+|----------|---------|-------------|
+| `--langs` | `ko ja en de` | Languages to generate |
+| `--samples` | `5000` | Pairs per language |
+| `--variants` | `3` | Corruption variants per word |
+| `--output` | `data/wiki_aug.jsonl` | Output file path |
+
+### 3. Merge with training data
+
+In `finetune_byt5-base.py`, find this line:
+```python
+train_flat = flatten(dataset['train'])
+```
+
+Add right below it:
+```python
+from datasets import concatenate_datasets
+
+wiki_aug   = load_dataset('json', data_files='data/wiki_aug.jsonl', split='train')
+train_flat = concatenate_datasets([train_flat, wiki_aug])
+```
+
+Then clear the cache so it re-tokenizes:
+```bash
+rm -rf ./data/cached/
+```
+
+---
+
+## What it does
+
+Streams clean Wikipedia sentences → applies corruption rules → saves `(noisy, clean)` pairs.
+
+The **target is never modified** — only the input is corrupted.
+
+```
+Wikipedia text:  "많이"
+                    ↓  corruption applied
+Output pair:     raw:  "많이ㅋ"    ← noisy input (what model receives)
+                 norm: "많이"      ← clean target (what model should output, unchanged)
+```
+
+Output is saved as JSONL:
+```json
+{"raw": "많이ㅋ",    "norm": "많이",    "lang": "ko", "corruption": "filler"}
+{"raw": "becuase",   "norm": "because", "lang": "en", "corruption": "swap_chars"}
+{"raw": "アリガトウ", "norm": "ありがとう", "lang": "ja", "corruption": "kana_swap"}
+```
+
+---
+
+## Implementations
+
+### 1. Weighted Corruption Probabilities
+
+Each corruption rule has a different probability weight — common real-world errors appear more often than rare ones.
+
+```python
+# Before (v1) — every rule equally likely
+random.choice(rules)
+
+# After (v2) — weighted by how common each error is in real text
+random.choices(rules, weights=[0.35, 0.10, 0.25, 0.15, 0.15], k=1)
+```
+
+Example weights for Korean:
+
+| Rule | Weight | Reason |
+|------|--------|--------|
+| filler (`ㅋ/ㅠ`) | 35% | Very common in Korean online text |
+| jamo decomposition | 25% | Common typo pattern |
+| word repeat | 15% | Moderate frequency |
+| spacing error | 15% | Moderate frequency |
+| number sub (`ㅇ→0`) | 10% | Rare |
+
+---
+
+### 2. Spacing Corruption
+
+Simulates missing or incorrect spaces — especially important for Korean, where spacing errors are extremely common in online writing.
+
+```
+Original:  "자연어"
+Corrupted: "자연"       ← one character dropped (spacing collapsed)
+
+Original:  "a lot"
+Corrupted: "alot"       ← space removed
+```
+
+---
+
+### 3. Realistic Typo Simulation
+
+Replaced unrealistic augmentations (e.g. full word duplication) with natural human typing mistakes.
+
+**Character deletion** — accidentally skipping a key:
+```
+"because"  →  "becuse"
+"really"   →  "realy"
+```
+
+**Adjacent character swap** — hitting two keys in the wrong order:
+```
+"the"   →  "hte"
+"from"  →  "form"
+```
+
+**Vowel repetition** — holding a key too long:
+```
+"so"      →  "sooo"
+"really"  →  "reeeally"
+```
+
+---
+
+### 4. Language-Specific Corruption Rules
+
+Each language has rules that reflect how people actually write informally online.
+
+**Korean (`ko`)**
+```
+"많이"  →  "많이ㅋ"     # filler syllable appended
+"이거"  →  "이0거"      # ㅇ replaced with 0 (visual similarity)
+"많이"  →  "많ㅏㅇㅣ"   # last syllable decomposed into jamo
+```
+
+**Japanese (`ja`)**
+```
+"ありがとう"  →  "アリガトウ"    # hiragana → katakana swap
+"ありがとう"  →  "ありーがとう"   # long vowel ー inserted
+"ています"   →  "てる"          # colloquial contraction
+```
+
+**English (`en`)**
+```
+"going"    →  "goin'"    # drop trailing g (-ing → -in')
+"want to"  →  "wanna"    # contraction
+"really"   →  "reeeally" # vowel repetition
+```
+
+**German (`de`)**
+```
+"können"  →  "koennen"  # umlaut removed (ü → ue)
+"Haus"    →  "haus"     # lowercase (casual writing)
+"eine"    →  "ein"      # drop final e
+```
+
+---
+
+### 5. Morpheme-Level Tokenization
+
+Instead of splitting by whitespace (which gives poor results for Korean and Japanese), the script uses proper tokenizers.
+
+| Language | Tokenizer | Fallback |
+|----------|-----------|---------|
+| Korean | KoNLPy / Okt | whitespace |
+| Japanese | fugashi + unidic-lite | whitespace |
+| English | whitespace | — |
+| German | whitespace | — |
+
+```python
+# Korean example
+Okt().morphs("자연어처리")
+# → ["자연어", "처리"]   ← correct morpheme boundaries
+
+"자연어처리".split()
+# → ["자연어처리"]       ← treats whole word as one token
+```
+
+If KoNLPy or fugashi is not installed, the script automatically falls back to whitespace tokenization with a warning — it won't crash.
+
+---
+
+### 6. Corruption Metadata
+
+Every output pair records which corruption rule was applied.
+
+```json
+{"raw": "becuase", "norm": "because", "lang": "en", "corruption": "swap_chars"}
+```
+
+This enables:
+- Per-rule ablation studies (which rules actually help?)
+- Error analysis (which corruptions are hardest for the model?)
+- Filtering specific rule types for experiments
+
+---
+
+## References
+
+- Samuel & Straka (2021). *ÚFAL at MultiLexNorm 2021: Improving Multilingual Lexical Normalization by Fine-tuning ByT5.* W-NUT 2021.
+- van der Goot et al. (2021). *MultiLexNorm: A Shared Task on Multilingual Lexical Normalization.* W-NUT 2021.
