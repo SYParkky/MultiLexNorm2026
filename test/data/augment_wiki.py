@@ -1,5 +1,5 @@
 """
-augment_wiki.py — Wikipedia Corruption Augmentation (v2)
+augment_wiki.py — Wikipedia Corruption Augmentation 
 Generates synthetic (noisy_input, clean_target) pairs for lexical normalization.
 
 Output format matches finetune_byt5-base.py:
@@ -84,7 +84,7 @@ def corrupt_swap_chars(word):
 
 # ── Korean ────────────────────────────────────────────────────────────────────
 
-KO_FILLERS = ['ㅋ', 'ㅠ', 'ㄷ', 'ㅎ', 'ㄱ', '~', '...']
+KO_FILLERS = ['ㅋ', 'ㅠ', 'ㅜ', 'ㅎ', '~', '...']
 
 def _decompose_hangul(char):
     """Break a Hangul syllable into its jamo components."""
@@ -118,10 +118,20 @@ def ko_num_sub(w):
             result.append(ch)
     return ''.join(result)
 def ko_spacing(w):      return corrupt_delete_char(w)   # simulate missing space
+def ko_trail_jamo(w):
+    """Append the last jamo of the word — e.g. 나비 → 나비ㅣ, 나방 → 나방ㅇ."""
+    last = w[-1]
+    d = _decompose_hangul(last)
+    if d:
+        # if there's a 종성, use it; otherwise use the 중성 (vowel)
+        trail = d[2] if d[2] else d[1]
+        return w + trail
+    # non-Hangul: just append the last character as-is
+    return w + last
 
-KO_RULES   = [ko_filler, ko_repeat, ko_decompose, ko_num_sub, ko_spacing]
-KO_WEIGHTS = [0.35,      0.15,      0.25,         0.10,       0.15]
-KO_NAMES   = ['filler',  'repeat',  'decompose',  'num_sub',  'spacing']
+KO_RULES   = [ko_filler, ko_repeat, ko_decompose, ko_num_sub, ko_spacing, ko_trail_jamo]
+KO_WEIGHTS = [0.25,      0.05,      0.20,         0.10,       0.20,       0.20]
+KO_NAMES   = ['filler',  'repeat',  'decompose',  'num_sub',  'spacing',  'trail_jamo']
 
 
 # ── Japanese ──────────────────────────────────────────────────────────────────
@@ -339,3 +349,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
