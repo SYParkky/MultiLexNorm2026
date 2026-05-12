@@ -78,138 +78,135 @@ Output is saved as JSONL:
 ---
 
 ## Implementations
-
+ 
 ### 1. Weighted Corruption Probabilities
-
+ 
 Each corruption rule has a different probability weight — common real-world errors appear more often than rare ones.
-
-```python
-# Before (v1) — every rule equally likely
-random.choice(rules)
-
-# After (v2) — weighted by how common each error is in real text
-random.choices(rules, weights=[0.35, 0.10, 0.25, 0.15, 0.15], k=1)
-```
-
+ 
+ 
 Example weights for Korean:
-
+ 
 | Rule | Weight | Reason |
 |------|--------|--------|
-| filler (`ㅋ/ㅠ`) | 35% | Very common in Korean online text |
-| jamo decomposition | 25% | Common typo pattern |
-| word repeat | 15% | Moderate frequency |
-| spacing error | 15% | Moderate frequency |
-| number sub (`ㅇ→0`) | 10% | Rare |
-
+| filler (`ㅋ/ㅠ/ㅜ/ㅎ/~/...`) | 25% | Very common in Korean online text |
+| 자모 decomposition | 20% | Common typo pattern |
+| spacing error | 20% | Very common in online writing |
+| trail 자모 (`나비ㅣ`, `나방ㅇ`) | 20% | Common informal typing pattern |
+| number sub (`ㅇ→0`) | 10% | Moderate frequency |
+| word repeat | 5% | Rare |
+ 
 ---
-
+ 
 ### 2. Spacing Corruption
-
+ 
 Simulates missing or incorrect spaces — especially important for Korean, where spacing errors are extremely common in online writing.
-
+ 
 ```
 Original:  "자연어"
 Corrupted: "자연"       ← one character dropped (spacing collapsed)
-
+ 
 Original:  "a lot"
 Corrupted: "alot"       ← space removed
 ```
-
+ 
 ---
-
+ 
 ### 3. Realistic Typo Simulation
-
+ 
 Replaced unrealistic augmentations (e.g. full word duplication) with natural human typing mistakes.
-
+ 
 **Character deletion** — accidentally skipping a key:
 ```
 "because"  →  "becuse"
 "really"   →  "realy"
 ```
-
+ 
 **Adjacent character swap** — hitting two keys in the wrong order:
 ```
 "the"   →  "hte"
 "from"  →  "form"
 ```
-
+ 
 **Vowel repetition** — holding a key too long:
 ```
 "so"      →  "sooo"
 "really"  →  "reeeally"
 ```
-
+ 
 ---
-
+ 
 ### 4. Language-Specific Corruption Rules
-
+ 
 Each language has rules that reflect how people actually write informally online.
-
+ 
 **Korean (`ko`)**
 ```
-"많이"  →  "많이ㅋ"     # filler syllable appended
-"이거"  →  "0l거"      # ㅇ replaced with 0 (visual similarity)
+"많이"  →  "많이ㅋ"     # filler appended (ㅋ/ㅠ/ㅜ/ㅎ/~/...)
+"나비"  →  "나비ㅣ"     # trail jamo — last vowel appended
+"나방"  →  "나방ㅇ"     # trail jamo — last consonant appended
+"이거"  →  "이0거"      # ㅇ replaced with 0 (visual similarity)
 "많이"  →  "많ㅏㅇㅣ"   # last syllable decomposed into jamo
 ```
-
+ 
 **Japanese (`ja`)**
 ```
 "ありがとう"  →  "アリガトウ"    # hiragana → katakana swap
 "ありがとう"  →  "ありーがとう"   # long vowel ー inserted
 "ています"   →  "てる"          # colloquial contraction
 ```
-
+ 
 **English (`en`)**
 ```
-"going"    →  "goin'"    # drop trailing g (-ing → -in')
-"want to"  →  "wanna"    # contraction
-"really"   →  "reeeally" # vowel repetition
+"going"    →  "goin'"     # drop trailing g (-ing → -in')
+"want to"  →  "wanna"     # contraction
+"really"   →  "reeeally"  # vowel repetition
 ```
-
+ 
 **German (`de`)**
 ```
 "können"  →  "koennen"  # umlaut removed (ü → ue)
 "Haus"    →  "haus"     # lowercase (casual writing)
 "eine"    →  "ein"      # drop final e
 ```
-
+ 
 ---
-
+ 
 ### 5. Morpheme-Level Tokenization
-
+ 
 Instead of splitting by whitespace (which gives poor results for Korean and Japanese), the script uses proper tokenizers.
-
+ 
 | Language | Tokenizer | Fallback |
 |----------|-----------|---------|
 | Korean | KoNLPy / Okt | whitespace |
 | Japanese | fugashi + unidic-lite | whitespace |
 | English | whitespace | — |
 | German | whitespace | — |
-
+ 
 ```python
 # Korean example
 Okt().morphs("자연어처리")
 # → ["자연어", "처리"]   ← correct morpheme boundaries
-
+ 
 "자연어처리".split()
 # → ["자연어처리"]       ← treats whole word as one token
 ```
-
+ 
 If KoNLPy or fugashi is not installed, the script automatically falls back to whitespace tokenization with a warning — it won't crash.
-
+ 
 ---
-
+ 
 ### 6. Corruption Metadata
-
+ 
 Every output pair records which corruption rule was applied.
-
+ 
 ```json
 {"raw": "becuase", "norm": "because", "lang": "en", "corruption": "swap_chars"}
 ```
-
+ 
 This enables:
 - Per-rule ablation studies (which rules actually help?)
 - Error analysis (which corruptions are hardest for the model?)
 - Filtering specific rule types for experiments
+---
 
-
+I didn't add the weights for English, German, and Japanese yet! I think the weights might be adjusted
