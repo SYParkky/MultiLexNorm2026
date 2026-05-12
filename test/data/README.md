@@ -1,7 +1,6 @@
 # augment_wiki.py — Wikipedia Corruption Augmentation
 
 Generates synthetic `(noisy input → clean target)` training pairs from Wikipedia text.
-Part of the **MultiLexNorm 2026** project — SKKU AI Introduction (Spring 2026).
 
 ---
 
@@ -152,7 +151,7 @@ Each language has rules that reflect how people actually write informally online
 **Korean (`ko`)**
 ```
 "많이"  →  "많이ㅋ"     # filler syllable appended
-"이거"  →  "이0거"      # ㅇ replaced with 0 (visual similarity)
+"이거"  →  "0l거"      # ㅇ replaced with 0 (visual similarity)
 "많이"  →  "많ㅏㅇㅣ"   # last syllable decomposed into jamo
 ```
 
@@ -216,9 +215,4 @@ This enables:
 - Error analysis (which corruptions are hardest for the model?)
 - Filtering specific rule types for experiments
 
----
 
-## References
-
-- Samuel & Straka (2021). *ÚFAL at MultiLexNorm 2021: Improving Multilingual Lexical Normalization by Fine-tuning ByT5.* W-NUT 2021.
-- van der Goot et al. (2021). *MultiLexNorm: A Shared Task on Multilingual Lexical Normalization.* W-NUT 2021.
