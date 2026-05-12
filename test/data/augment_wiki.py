@@ -272,7 +272,7 @@ def generate(lang, n_samples, n_variants=3):
     ds_name, ds_cfg = WIKI_CONFIG[lang]
 
     print(f"[{lang}] Loading Wikipedia ({ds_cfg})...")
-    dataset = load_dataset(ds_name, ds_cfg, split='train', streaming=True, trust_remote_code=True)
+    dataset = load_dataset(ds_name, ds_cfg, split='train', streaming=True)
 
     pairs = []
     seen  = set()
