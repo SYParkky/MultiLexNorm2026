@@ -11,7 +11,7 @@ import zipfile
 import json
 
 # ===== 1. Login =====
-login(token="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")  # 토큰 바꿔줘
+login(token="")  # 토큰 바꿔줘
 
 # ===== 2. Config =====
 BATCH_SIZE = 256

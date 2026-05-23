@@ -10,7 +10,7 @@ from huggingface_hub import login
 from transformers import T5ForConditionalGeneration, AutoTokenizer
 
 # ===== 1. Config =====
-login(token="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")  # 토큰 바꿔줘
+login(token="")  # 토큰 바꿔줘
 
 MODEL_NAME = "google/byt5-base"
 MAX_LEN    = 128
