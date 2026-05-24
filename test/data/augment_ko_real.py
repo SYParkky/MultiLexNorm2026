@@ -1,18 +1,86 @@
-import random
-import re
 import json
+import re
+import random
 import argparse
-from collections import Counter
 
 random.seed(42)
+
+# ═══════════════════════════════════════════════════════════════
+# Normalization Rules
+# ═══════════════════════════════════════════════════════════════
+
+SLANG_RULES = {
+
+    # internet slang
+    'ㄹㅇ': '정말',
+    '레알': '정말',
+
+    '개': '매우',
+    '존나': '매우',
+    '겁나': '매우',
+
+    'ㅇㅈ': '인정',
+    'ㄴㄴ': '아니',
+    'ㅇㅇ': '응',
+
+    'ㅁㅊ': '미친',
+    'ㅅㅂ': '짜증난다',
+
+    'ㄱㅅ': '고마워',
+    'ㅊㅋ': '축하해',
+
+    '어케': '어떻게',
+    '어캐': '어떻게',
+
+    '걍': '그냥',
+
+    '커엽': '귀엽',
+    '존맛': '정말 맛있다',
+
+    '꿀잼': '정말 재미있다',
+    '노잼': '재미없다',
+
+    '실화냐': '정말이야',
+
+    'GOAT': '최고',
+    'goat': '최고',
+}
+
+# phrase-level normalization
+PHRASE_RULES = [
+
+    ('개좋', '매우 좋'),
+    ('개웃기', '매우 웃기'),
+    ('개귀엽', '매우 귀엽'),
+    ('개잘', '매우 잘'),
+
+    ('존나 웃기', '매우 웃기'),
+    ('존나 잘', '매우 잘'),
+
+    ('ㄹㅇ 개', '정말 매우'),
+]
+
+# fillers to remove
+FILLERS = [
+    'ㅋㅋㅋㅋㅋㅋ',
+    'ㅋㅋㅋㅋㅋ',
+    'ㅋㅋㅋㅋ',
+    'ㅋㅋㅋ',
+    'ㅋㅋ',
+    'ㅠㅠㅠㅠ',
+    'ㅠㅠㅠ',
+    'ㅠㅠ',
+    'ㄷㄷ',
+    'ㄹㅇ',
+]
 
 # ═══════════════════════════════════════════════════════════════
 # Utilities
 # ═══════════════════════════════════════════════════════════════
 
-def is_valid_text(text):
+def is_valid_comment(text):
 
-    if not text:
+    if not isinstance(text, str):
         return False
 
     text = text.strip()
@@ -23,273 +91,122 @@ def is_valid_text(text):
     if len(text) > 80:
         return False
 
-    if not re.search(r"[가-힣]", text):
+    if not re.search(r'[가-힣]', text):
         return False
 
     return True
 
 
-def tokenize(text):
-    return text.split()
+def clean_text(text):
 
+    text = text.strip()
 
-# ═══════════════════════════════════════════════════════════════
-# Realistic Korean Internet Noise
-# ═══════════════════════════════════════════════════════════════
+    # URL 제거
+    text = re.sub(r'http\S+', '', text)
 
-CLEAN_TO_NOISY = {
-
-    '진짜': ['ㄹㅇ', '레알', '진짜루'],
-    '너무': ['넘', '개', '겁나'],
-    '정말': ['진짜', 'ㄹㅇ'],
-
-    '좋아': ['조아', '좋앙'],
-    '좋다': ['좋음', '굳'],
-
-    '웃기다': ['개웃기다', '존웃'],
-    '웃겨': ['개웃겨', '존웃'],
-
-    '싫어': ['실어', '극혐'],
-
-    '인정': ['ㅇㅈ'],
-    '맞아': ['ㅇㅇ', 'ㄹㅇ'],
-    '아니야': ['ㄴㄴ'],
-
-    '몰라': ['몰루', 'ㅁㄹ'],
-
-    '고마워': ['ㄱㅅ'],
-    '미안해': ['ㅁㅇ'],
-    '축하해': ['ㅊㅋ'],
-
-    '귀엽다': ['커엽다'],
-    '귀여워': ['커여워'],
-
-    '없어': ['업서'],
-    '있어': ['이써'],
-
-    '어떻게': ['어케', '어캐'],
-    '이렇게': ['이케'],
-
-    '그냥': ['걍'],
-}
-
-FILLERS = [
-    'ㅋㅋ',
-    'ㅋㅋㅋ',
-    'ㅠㅠ',
-    'ㄹㅇ',
-    '...',
-]
-
-DOE_DAE_RULES = [
-    ('돼', '되'),
-    ('됐', '됬'),
-    ('좋아', '조아'),
-    ('싫어', '실어'),
-    ('많이', '마니'),
-]
-
-SPACING_RULES = [
-    ('할 수 있어', '할수있어'),
-    ('볼 수 있어', '볼수있어'),
-    ('생각해 보면', '생각해보면'),
-    ('진짜 웃기다', '진짜웃기다'),
-    ('너무 좋아', '너무좋아'),
-    ('안 돼', '안돼'),
-]
-
-RULE_NAMES = [
-    'slang',
-    'doe_dae',
-    'spacing',
-    'filler',
-]
-
-RULE_WEIGHTS = [
-    0.45,
-    0.20,
-    0.15,
-    0.20,
-]
-
-
-# ═══════════════════════════════════════════════════════════════
-# Corruption Functions
-# ═══════════════════════════════════════════════════════════════
-
-def apply_slang(token):
-
-    if token in CLEAN_TO_NOISY:
-        return random.choice(CLEAN_TO_NOISY[token])
-
-    return token
-
-
-def apply_doe_dae(text):
-
-    for clean, noisy in DOE_DAE_RULES:
-
-        if clean in text and random.random() < 0.5:
-            text = text.replace(clean, noisy, 1)
-
-    return text
-
-
-def apply_spacing(text):
-
-    for clean, noisy in SPACING_RULES:
-
-        if clean in text and random.random() < 0.5:
-            text = text.replace(clean, noisy, 1)
+    # 공백 정리
+    text = re.sub(r'\s+', ' ', text)
 
     return text
 
 
 # ═══════════════════════════════════════════════════════════════
-# Sentence-Level Corruption
+# Normalization
 # ═══════════════════════════════════════════════════════════════
 
-def corrupt_sentence(text):
+def normalize_comment(text):
 
-    tokens = tokenize(text)
+    norm = text
 
-    applied = []
-
-    if not tokens:
-        return text, applied
-
-    n_changes = random.randint(1, min(3, len(tokens)))
-
-    indices = random.sample(
-        range(len(tokens)),
-        n_changes
+    # timestamps 제거
+    norm = re.sub(
+        r'\b\d{1,2}:\d{2}\b',
+        '',
+        norm
     )
 
-    for idx in indices:
+    # fillers 제거
+    for filler in FILLERS:
+        norm = norm.replace(filler, '')
 
-        rule = random.choices(
-            RULE_NAMES,
-            weights=RULE_WEIGHTS,
-            k=1
-        )[0]
+    # phrase rules
+    for noisy, clean in PHRASE_RULES:
+        norm = norm.replace(noisy, clean)
 
-        original = tokens[idx]
+    # token rules
+    tokens = norm.split()
 
-        if rule == 'slang':
-            tokens[idx] = apply_slang(tokens[idx])
+    normalized_tokens = []
 
-        if tokens[idx] != original:
-            applied.append(rule)
+    for token in tokens:
 
-    sentence = ' '.join(tokens)
+        stripped = token.strip()
 
-    before = sentence
+        if stripped in SLANG_RULES:
+            normalized_tokens.append(
+                SLANG_RULES[stripped]
+            )
+        else:
+            normalized_tokens.append(token)
 
-    sentence = apply_doe_dae(sentence)
+    norm = ' '.join(normalized_tokens)
 
-    if sentence != before:
-        applied.append('doe_dae')
+    # repeated punctuation cleanup
+    norm = re.sub(r'[~]{2,}', '~', norm)
+    norm = re.sub(r'[!]{2,}', '!', norm)
+    norm = re.sub(r'[?]{2,}', '?', norm)
+    norm = re.sub(r'[.]{2,}', '.', norm)
 
-    before = sentence
+    # extra spaces cleanup
+    norm = re.sub(r'\s+', ' ', norm)
 
-    sentence = apply_spacing(sentence)
+    norm = norm.strip()
 
-    if sentence != before:
-        applied.append('spacing')
-
-    if random.random() < 0.35:
-
-        sentence += random.choice(FILLERS)
-
-        applied.append('filler')
-
-    return sentence, list(set(applied))
-
-
-# ═══════════════════════════════════════════════════════════════
-# Load REAL YouTube Comments
-# ═══════════════════════════════════════════════════════════════
-
-def load_youtube_comments(path):
-
-    with open(path, "r", encoding="utf-8") as f:
-        comments = json.load(f)
-
-    cleaned = []
-
-    seen = set()
-
-    for text in comments:
-
-        if not isinstance(text, str):
-            continue
-
-        text = text.strip()
-
-        # URL 제거
-        text = re.sub(r"http\S+", "", text)
-
-        # 공백 정리
-        text = re.sub(r"\s+", " ", text)
-
-        if not is_valid_text(text):
-            continue
-
-        # 과도한 ㅋㅋ 제거
-        if text.count("ㅋ") > 15:
-            continue
-
-        # 중복 제거
-        if text in seen:
-            continue
-
-        seen.add(text)
-
-        cleaned.append(text)
-
-    print(f"\n[ko] loaded {len(cleaned)} real comments")
-
-    print("\nSample comments:\n")
-
-    for x in random.sample(cleaned, min(10, len(cleaned))):
-        print(x)
-
-    return cleaned
+    return norm
 
 
 # ═══════════════════════════════════════════════════════════════
-# Generate Dataset
+# Build Dataset
 # ═══════════════════════════════════════════════════════════════
 
-def generate_dataset(comments, n_samples=10000):
+def build_dataset(comments, max_samples=5000):
 
     dataset = []
 
-    seen_pairs = set()
+    seen = set()
 
-    for text in comments:
+    for raw in comments:
 
-        if len(dataset) >= n_samples:
-            break
+        raw = clean_text(raw)
 
-        noisy, rules = corrupt_sentence(text)
-
-        if noisy == text:
+        if not is_valid_comment(raw):
             continue
 
-        pair_key = (noisy, text)
+        norm = normalize_comment(raw)
 
-        if pair_key in seen_pairs:
+        # normalization 변화 없는 경우 skip
+        if raw == norm:
             continue
 
-        seen_pairs.add(pair_key)
+        # 너무 짧은 norm 제거
+        if len(norm) < 3:
+            continue
+
+        pair = (raw, norm)
+
+        if pair in seen:
+            continue
+
+        seen.add(pair)
 
         dataset.append({
-            "raw": noisy,
-            "norm": text,
-            "lang": "ko",
-            "corruption": rules
+            "raw": raw,
+            "norm": norm,
+            "lang": "ko"
         })
+
+        if len(dataset) >= max_samples:
+            break
 
     return dataset
 
@@ -311,7 +228,7 @@ def main():
     parser.add_argument(
         '--output',
         type=str,
-        default='augment_ko_real.jsonl'
+        default='real_yt_normalization.jsonl'
     )
 
     parser.add_argument(
@@ -322,13 +239,20 @@ def main():
 
     args = parser.parse_args()
 
-    comments = load_youtube_comments(args.input)
+    # load comments
+    with open(args.input, 'r', encoding='utf-8') as f:
+        comments = json.load(f)
 
-    dataset = generate_dataset(
-        comments=comments,
-        n_samples=args.samples
+    print(f'\nloaded comments: {len(comments)}')
+
+    dataset = build_dataset(
+        comments,
+        max_samples=args.samples
     )
 
+    print(f'\nbuilt dataset: {len(dataset)}')
+
+    # save jsonl
     with open(args.output, 'w', encoding='utf-8') as f:
 
         for row in dataset:
@@ -340,42 +264,18 @@ def main():
                 ) + '\n'
             )
 
-    print(f"\n✅ saved {len(dataset)} samples")
+    print(f'\nsaved -> {args.output}')
 
-    print(f"→ {args.output}")
-
-    counts = Counter()
-
-    for row in dataset:
-
-        for r in row['corruption']:
-            counts[r] += 1
-
-    total = len(dataset)
-
-    print("\nRule coverage:\n")
-
-    for k, v in sorted(
-        counts.items(),
-        key=lambda x: -x[1]
-    ):
-
-        print(
-            f"{k:15s} "
-            f"{v:5d} "
-            f"({v/total*100:.1f}%)"
-        )
-
-    print("\nSample outputs:\n")
+    # preview
+    print('\nSAMPLE OUTPUTS:\n')
 
     for x in random.sample(
         dataset,
-        min(10, len(dataset))
+        min(20, len(dataset))
     ):
 
-        print("RAW :", x['raw'])
-        print("NORM:", x['norm'])
-        print("RULE:", x['corruption'])
+        print('RAW :', x['raw'])
+        print('NORM:', x['norm'])
         print()
 
 
