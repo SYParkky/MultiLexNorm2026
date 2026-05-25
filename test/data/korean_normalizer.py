@@ -58,7 +58,7 @@ SLANG_DICT = {
     '새끼': '친구',
     '겜': '게임',
     '짱깨':'중국',
-    
+
 
     # ── 긍정/부정 반응 ──────────────────────────────────────────
     'ㅇㅈ': '인정',
@@ -221,16 +221,18 @@ SLANG_DICT = {
     '있어용': '있어요',
     '없어용': '없어요',
     '좋아용': '좋아요',
-    '해용': '해요',
-    '같아용': '같아요',
 }
+
+# 사전 키를 길이 내림차순으로 정렬해 longest-match 매칭 보장
+# (예: '레전드'가 '레전'보다 먼저 매칭되는 오류 방지)
+_SORTED_SLANG_KEYS = sorted(SLANG_DICT.keys(), key=len, reverse=True)
 
 
 # ═══════════════════════════════════════════════════════════════
 # 2. PREFIX RULES (형태소 내부 접두사)
 # ═══════════════════════════════════════════════════════════════
 
-# 접두사 규칙: 형용사 어간 whitelist 앞에만 적용 ( 오적용 방지)
+# 접두사 규칙: 형용사 어간 whitelist 앞에만 적용 (오적용 방지)
 _ADJ_WHITELIST = (
     '좋아|좋은|좋다|웃겨|웃긴|웃기|귀여|슬퍼|슬픈|힘들|빠르|느리|맛있|맛없|예뻐|예쁜|예쁘|별로|재미|많이|크다|작다|높다|낮다|쉽|어렵|무서|싫어|춥|덥'
 )
@@ -241,7 +243,7 @@ PREFIX_RULES = [
     (re.compile(r'^존나(?=[가-힣]{2,})'), '매우 '),
     (re.compile(r'^존내(?=[가-힣]{2,})'), '매우 '),
     (re.compile(r'^겁나(?=[가-힣]{2,})'), '매우 '),
-    # 개/핵/ — whitelist 형용사 앞에만 적용
+    # 개/핵 — whitelist 형용사 앞에만 적용
     (re.compile(rf'^개(?={_ADJ_WHITELIST})'), '매우 '),
     (re.compile(rf'^핵(?={_ADJ_WHITELIST})'), '매우 '),
     (re.compile(r'^ㄹㅇ(?=[가-힣]{2,})'), '정말 '),
@@ -291,13 +293,7 @@ PHRASE_RULES = [
 
 
 # ═══════════════════════════════════════════════════════════════
-# 4. JAMO FILLER PATTERNS
-# ═══════════════════════════════════════════════════════════════
-
-
-
-# ═══════════════════════════════════════════════════════════════
-# 5. YOUTUBE-SPECIFIC CLEANUP PATTERNS
+# 4. YOUTUBE-SPECIFIC CLEANUP PATTERNS
 # ═══════════════════════════════════════════════════════════════
 
 YOUTUBE_PATTERNS = [
@@ -315,11 +311,14 @@ YOUTUBE_PATTERNS = [
 
 
 # ═══════════════════════════════════════════════════════════════
-# 6. TYPO CORRECTION (정규표현식 기반)
+# 5. TYPO CORRECTION (정규표현식 기반)
 # ═══════════════════════════════════════════════════════════════
 
 # 자모 suffix 제거 패턴 (한글 뒤에 붙은 의미없는 자모)
 JAMO_SUFFIX_PATTERN = re.compile(r'(?<=[가-힣])[ㄱ-ㅎ]+$')
+
+# 한글 뒤에 붙은 ㅠ/ㅜ 제거 (예: 좋다ㅠㅠ → 좋다)
+JAMO_VOWEL_SUFFIX_PATTERN = re.compile(r'(?<=[가-힣])[ㅠㅜ]+')
 
 TYPO_PATTERNS = [
     # 됬 → 됐
@@ -337,13 +336,10 @@ TYPO_PATTERNS = [
     (re.compile(r'이용\b'), '이요'),
     (re.compile(r'욤\b'), '요'),
     (re.compile(r'염\b'), '요'),
-    # '당' 어미: 2글자 이상 토큰에서 문장 끝 '당' → '다'
-    # 단, "당연히", "당신" 등 충돌 방지를 위해 한글+당 패턴
+    # '당' 어미: 한글 뒤 문장 끝 '당' → '다'
     (re.compile(r'(?<=[가-힣])당\b'), '다'),
 
     # ── 쌍자음 → 단자음 오류 교정 ───────────────────────────────
-    # "잇어" → "있어", "업어" → "없어", "읍어" → "없어"
-    # 패턴: 쌍받침이 빠진 형태를 복원
     (re.compile(r'잇어'), '있어'),
     (re.compile(r'잇는'), '있는'),
     (re.compile(r'잇다'), '있다'),
@@ -353,9 +349,9 @@ TYPO_PATTERNS = [
     (re.compile(r'업는'), '없는'),
     (re.compile(r'업음'), '없음'),
     (re.compile(r'\b읍어\b'), '없어'),
-    (re.compile(r'\b안자\b'), '앉아'),        # 안자 → 앉아
+    (re.compile(r'\b안자\b'), '앉아'),
     (re.compile(r'\b안자서\b'), '앉아서'),
-    (re.compile(r'\b몰아\b'), '몰라'),        # 자음 탈락 오류
+    (re.compile(r'\b몰아\b'), '몰라'),
     (re.compile(r'\b알아서해\b'), '알아서 해'),
     (re.compile(r'\b할수잇어\b'), '할 수 있어'),
     (re.compile(r'\b할수업어\b'), '할 수 없어'),
@@ -363,7 +359,7 @@ TYPO_PATTERNS = [
 
 
 # ═══════════════════════════════════════════════════════════════
-# 7. CONTEXT-AWARE TOKEN DISAMBIGUATION
+# 6. CONTEXT-AWARE TOKEN DISAMBIGUATION
 # ═══════════════════════════════════════════════════════════════
 
 def disambiguate_token(
@@ -372,13 +368,13 @@ def disambiguate_token(
     next_token: Optional[str]
 ) -> str:
 
-    # 자모 필러: 단독 ㅠ+ 토큰 → 제거 (ㅋ, ㅎ는 gold 원본 유지)
-   # if re.fullmatch(r'[ㅠㅜ]+', token):
-    #    return ''
-    #if re.fullmatch(r'ㄷ+', token):
-     #   if token in SLANG_DICT:
-      #      return SLANG_DICT[token]
-       # return ''
+    # 자모 필러: 단독 ㅠ+/ㅜ+ 토큰 → 제거
+    if re.fullmatch(r'[ㅠㅜ]+', token):
+        return ''
+    if re.fullmatch(r'ㄷ+', token):
+        if token in SLANG_DICT:
+            return SLANG_DICT[token]
+        return ''
 
     # '개' 단독 토큰: whitelist 형용사 앞에만 '매우'
     if token == '개':
@@ -390,29 +386,26 @@ def disambiguate_token(
     if token in ('진짜', '진쨔', '진짜로'):
         return '정말' if token != '진짜로' else '정말로'
 
-    # 사전 조회
+    # 사전 조회 (exact match)
     if token in SLANG_DICT:
         return SLANG_DICT[token]
 
-    # 복합 토큰: 자모 키이거나 나머지가 2자 이상일 때만 적용 (핵심→매우심 방지)
-    best_match_len = 0
-    best_replacement = None
-    for key, val in SLANG_DICT.items():
-        if token.startswith(key) and len(key) > best_match_len:
+    # 복합 토큰: longest-match로 접두 슬랭 처리
+    # BUG FIX: _SORTED_SLANG_KEYS(길이 내림차순)로 순회해
+    #          '레전드'가 '레전'보다 먼저 매칭되는 오류 방지
+    for key in _SORTED_SLANG_KEYS:
+        if token.startswith(key) and len(key) < len(token):
             remainder = token[len(key):]
             is_jamo_key = re.fullmatch(r'[ㄱ-ㅎㅏ-ㅣ]+', key)
-            if is_jamo_key or len(remainder) >= 2:
-                best_match_len = len(key)
-                best_replacement = val
-    if best_replacement is not None:
-        remainder = token[best_match_len:]
-        return best_replacement + remainder
+            # BUG FIX: remainder 1글자도 허용 (개꿀잼임 등)
+            if is_jamo_key or len(remainder) >= 1:
+                return SLANG_DICT[key] + remainder
 
     return token
 
 
 # ═══════════════════════════════════════════════════════════════
-# 8. PREFIX MORPHEME PROCESSING
+# 7. PREFIX MORPHEME PROCESSING
 # ═══════════════════════════════════════════════════════════════
 
 def apply_prefix_rules(token: str) -> str:
@@ -424,11 +417,16 @@ def apply_prefix_rules(token: str) -> str:
     return token
 
 
-
+def strip_jamo_suffix(token: str) -> str:
+    # 한글 뒤 자음 자모 제거
+    token = JAMO_SUFFIX_PATTERN.sub('', token)
+    # 한글 뒤 모음 자모(ㅠ/ㅜ) 제거
+    token = JAMO_VOWEL_SUFFIX_PATTERN.sub('', token)
+    return token
 
 
 # ═══════════════════════════════════════════════════════════════
-# 9. VALIDATION
+# 8. VALIDATION
 # ═══════════════════════════════════════════════════════════════
 
 def is_valid_comment(text: str) -> bool:
@@ -446,7 +444,7 @@ def is_valid_comment(text: str) -> bool:
 
 
 # ═══════════════════════════════════════════════════════════════
-# 10. TEXT CLEANING
+# 9. TEXT CLEANING
 # ═══════════════════════════════════════════════════════════════
 
 def clean_text(text: str) -> str:
@@ -458,7 +456,7 @@ def clean_text(text: str) -> str:
 
 
 # ═══════════════════════════════════════════════════════════════
-# 11. MAIN NORMALIZATION PIPELINE
+# 10. MAIN NORMALIZATION PIPELINE
 # ═══════════════════════════════════════════════════════════════
 
 def normalize_comment(text: str) -> str:
@@ -468,25 +466,21 @@ def normalize_comment(text: str) -> str:
     for pattern, replacement in YOUTUBE_PATTERNS:
         norm = pattern.sub(replacement, norm)
 
-    # Step 1: Jamo filler 제거
-    for pattern, replacement in JAMO_FILLER_PATTERNS:
-        norm = pattern.sub(replacement, norm)
-
-    # Step 2: Phrase-level rules (토큰화 전)
+    # Step 1: Phrase-level rules (토큰화 전)
     for noisy, clean in PHRASE_RULES:
         norm = norm.replace(noisy, clean)
 
-    # Step 3: Typo correction (regex 기반)
+    # Step 2: Typo correction (regex 기반)
     for pattern, replacement in TYPO_PATTERNS:
         norm = pattern.sub(replacement, norm)
 
-    # Step 4: Prefix morpheme rules + trailing jamo cleanup
+    # Step 3: Prefix morpheme rules + trailing jamo cleanup
     tokens = norm.split()
     tokens = [apply_prefix_rules(t) for t in tokens]
     tokens = [strip_jamo_suffix(t) for t in tokens]
     norm = ' '.join(tokens)
 
-    # Step 5: Context-aware token normalization
+    # Step 4: Context-aware token normalization
     tokens = norm.split()
     result_tokens = []
     for i, token in enumerate(tokens):
@@ -497,23 +491,17 @@ def normalize_comment(text: str) -> str:
         )
     norm = ' '.join(t for t in result_tokens if t)
 
-    # Step 6: Remove residual jamo fillers that weren't in slang dict
+    # Step 5: Remove residual jamo fillers
     norm = re.sub(r'ㄷ{3,}', '', norm)
 
-    # Step 6b: Punctuation normalization
-   # norm = re.sub(r'~{2,}', '~', norm)
-    #norm = re.sub(r'!{2,}', '!', norm)
-    #norm = re.sub(r'\?{2,}', '?', norm)
-    #norm = re.sub(r'\.{3,}', '...', norm)
-
-    # Step 7: Final whitespace cleanup
+    # Step 6: Final whitespace cleanup
     norm = re.sub(r'\s+', ' ', norm).strip()
 
     return norm
 
 
 # ═══════════════════════════════════════════════════════════════
-# 12. DATASET BUILDER
+# 11. DATASET BUILDER
 # ═══════════════════════════════════════════════════════════════
 
 def build_dataset(comments: list, max_samples: int = 5000) -> list:
@@ -556,7 +544,7 @@ def build_dataset(comments: list, max_samples: int = 5000) -> list:
 
 
 # ═══════════════════════════════════════════════════════════════
-# 13. SELF-TEST
+# 12. SELF-TEST
 # ═══════════════════════════════════════════════════════════════
 
 TEST_CASES = [
@@ -566,12 +554,12 @@ TEST_CASES = [
     ("왤케 이뻐요 진짜 레알", "왜 이렇게 예뻐요 정말 정말"),
     ("됬다 이제 다왔네 ㄱㅊ", "됐다 이제 다왔네 괜찮아"),
     ("귀엽당ㅠㅠ 진짜 개귀여워", "귀엽다 정말 매우 귀여워"),
-    ("1:23 여기서 소름ㄷㄷ 대박이다", "여기서 소름 굉장하다"),  # 소름ㄷㄷ → 소름 (jamo suffix 제거)
+    ("1:23 여기서 소름ㄷㄷ 대박이다", "여기서 소름 굉장하다"),
     ("구독각이다 ㄱㅅ", "구독해야겠어이다 고마워"),
-    ("ㄷㄷ 존나 쩐다 레전드네", "대단해 매우 굉장하다 전설네"),  # ㄷㄷ → 대단해 via slang dict
+    ("ㄷㄷ 존나 쩐다 레전드네", "대단해 매우 굉장하다 전설네"),
     ("꿀잼ㅋㅋ 개웃겨 ㄹㅇ", "재미있어 매우 웃겨 정말"),
     ("존맛탱이에용 또 먹고싶다", "정말 맛있어이에요 또 먹고싶다"),
-    ("ㅇㅇ 맞아 개꿀잼임", "응 맞아 매우 재미있어임"),  # 임 suffix는 보존 (과도한 교정 방지)
+    ("ㅇㅇ 맞아 개꿀잼임", "응 맞아 매우 재미있어임"),
     ("감사해용 진짜 최애곡이에용", "감사해요 정말 가장 좋아하는 노래이에요"),
 ]
 
@@ -596,7 +584,7 @@ def run_tests():
 
 
 # ═══════════════════════════════════════════════════════════════
-# 14. MAIN
+# 13. MAIN
 # ═══════════════════════════════════════════════════════════════
 
 def main():
@@ -634,7 +622,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-# ─────────────────────────────────────────────────────────────
-# PATCH: run quick fix and show results
-# ─────────────────────────────────────────────────────────────
