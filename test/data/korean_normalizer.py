@@ -294,11 +294,6 @@ PHRASE_RULES = [
 # 4. JAMO FILLER PATTERNS
 # ═══════════════════════════════════════════════════════════════
 
-JAMO_FILLER_PATTERNS = [
-    # ㅋ, ㅎ는 gold가 원본 유지 → 건드리지 않음
-    (re.compile(r'[ㅠㅜ]{2,}'), ''),
-    (re.compile(r'ㅡ{2,}'), ''),
-]
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -378,12 +373,12 @@ def disambiguate_token(
 ) -> str:
 
     # 자모 필러: 단독 ㅠ+ 토큰 → 제거 (ㅋ, ㅎ는 gold 원본 유지)
-    if re.fullmatch(r'[ㅠㅜ]+', token):
-        return ''
-    if re.fullmatch(r'ㄷ+', token):
-        if token in SLANG_DICT:
-            return SLANG_DICT[token]
-        return ''
+   # if re.fullmatch(r'[ㅠㅜ]+', token):
+    #    return ''
+    #if re.fullmatch(r'ㄷ+', token):
+     #   if token in SLANG_DICT:
+      #      return SLANG_DICT[token]
+       # return ''
 
     # '개' 단독 토큰: whitelist 형용사 앞에만 '매우'
     if token == '개':
@@ -429,9 +424,7 @@ def apply_prefix_rules(token: str) -> str:
     return token
 
 
-def strip_jamo_suffix(token: str) -> str:
-    """한글 토큰 끝에 붙은 의미없는 자모 제거. 예: '소름ㄷㄷ' → '소름'"""
-    return JAMO_SUFFIX_PATTERN.sub('', token)
+
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -508,10 +501,10 @@ def normalize_comment(text: str) -> str:
     norm = re.sub(r'ㄷ{3,}', '', norm)
 
     # Step 6b: Punctuation normalization
-    norm = re.sub(r'~{2,}', '~', norm)
-    norm = re.sub(r'!{2,}', '!', norm)
-    norm = re.sub(r'\?{2,}', '?', norm)
-    norm = re.sub(r'\.{3,}', '...', norm)
+   # norm = re.sub(r'~{2,}', '~', norm)
+    #norm = re.sub(r'!{2,}', '!', norm)
+    #norm = re.sub(r'\?{2,}', '?', norm)
+    #norm = re.sub(r'\.{3,}', '...', norm)
 
     # Step 7: Final whitespace cleanup
     norm = re.sub(r'\s+', ' ', norm).strip()
