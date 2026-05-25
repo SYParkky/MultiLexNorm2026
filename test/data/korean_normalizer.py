@@ -172,8 +172,6 @@ SLANG_DICT = {
     '열받음': '화났어',
     'ㅡㅡ': '짜증나',
     ';;': '당황스러워',
-    'ㅎㅎ': '하하',
-    'ㅎㅎㅎ': '하하하',
 
     # ── 유튜브 특화 ─────────────────────────────────────────────
     'ㅅㄱ': '수고해',
@@ -216,15 +214,14 @@ SLANG_DICT = {
 # 2. PREFIX RULES (형태소 내부 접두사)
 # ═══════════════════════════════════════════════════════════════
 
-# 접두사 규칙: 감정/상태 형용사 앞에만 적용 (명사 오적용 방지)
-# whitelist: 2자 이상 형용사 어간만 허용
+# 접두사 규칙: 형용사 어간 whitelist 앞에만 적용 (개념/핵심/진짜배기 오적용 방지)
 _ADJ_WHITELIST = (
     '좋아|좋은|좋다|웃겨|웃긴|웃기|귀여|슬퍼|슬픈|힘들|빠르|느리|맛있|맛없|예뻐|예쁜|예쁘|별로|재미|많이|크다|작다|높다|낮다|쉽|어렵|무서|싫어|춥|덥'
 )
 _ADJ_PAT = re.compile(rf'^(?:{_ADJ_WHITELIST})')
 
 PREFIX_RULES = [
-    # 존나/존내/겁나 — 단독 강조 부사로만 쓰이므로 그대로 적용
+    # 존나/존내/겁나 — 단독 강조 부사이므로 그대로 적용
     (re.compile(r'^존나(?=[가-힣]{2,})'), '매우 '),
     (re.compile(r'^존내(?=[가-힣]{2,})'), '매우 '),
     (re.compile(r'^겁나(?=[가-힣]{2,})'), '매우 '),
@@ -283,10 +280,8 @@ PHRASE_RULES = [
 # ═══════════════════════════════════════════════════════════════
 
 JAMO_FILLER_PATTERNS = [
-    (re.compile(r'ㅋ{2,}'), ''),
-    (re.compile(r'ㅎ{2,}'), ''),
+    # ㅋ, ㅎ는 gold가 원본 유지 → 건드리지 않음
     (re.compile(r'[ㅠㅜ]{2,}'), ''),
-    # ㄷ{2,}는 token 단계에서 사전으로 처리 (여기서 제거 안 함 → 순서 보장)
     (re.compile(r'ㅡ{2,}'), ''),
 ]
 
@@ -336,21 +331,6 @@ TYPO_PATTERNS = [
     # 단, "당연히", "당신" 등 충돌 방지를 위해 한글+당 패턴
     (re.compile(r'(?<=[가-힣])당\b'), '다'),
 
-    # ── -노 접미사 표준화 ────────────────────────────────────────
-    # "하노" → "하다", "됩노" → "됩니다", "이노" → "이다" 등
-    # 경상도 방언 어미 -노/-나노 처리
-    (re.compile(r'(?<=[가-힣])하노\b'), '하다'),
-    (re.compile(r'(?<=[가-힣])이노\b'), '이다'),
-    (re.compile(r'(?<=[가-힣])됩노\b'), '됩니다'),
-    (re.compile(r'(?<=[가-힣])있노\b'), '있어'),
-    (re.compile(r'(?<=[가-힣])없노\b'), '없어'),
-    (re.compile(r'(?<=[가-힣])맞노\b'), '맞아'),
-    (re.compile(r'(?<=[가-힣])좋노\b'), '좋아'),
-    (re.compile(r'(?<=[가-힣])크노\b'), '크다'),
-    (re.compile(r'(?<=[가-힣])나노\b'), '나'),     # 어미 '-나노' 끝 처리
-    # 범용: 위 패턴에 걸리지 않은 나머지 [가-힣]노 → [가-힣]다
-    (re.compile(r'(?<=[가-힣]{1})노\b'), '다'),
-
     # ── 쌍자음 → 단자음 오류 교정 ───────────────────────────────
     # "잇어" → "있어", "업어" → "없어", "읍어" → "없어"
     # 패턴: 쌍받침이 빠진 형태를 복원
@@ -382,19 +362,15 @@ def disambiguate_token(
     next_token: Optional[str]
 ) -> str:
 
-    # 자모 필러: 단독 ㅋ+ or ㅠ+ 토큰 → 제거
-    if re.fullmatch(r'ㅋ+', token):
-        return ''
+    # 자모 필러: 단독 ㅠ+ 토큰 → 제거 (ㅋ, ㅎ는 gold 원본 유지)
     if re.fullmatch(r'[ㅠㅜ]+', token):
         return ''
     if re.fullmatch(r'ㄷ+', token):
         if token in SLANG_DICT:
             return SLANG_DICT[token]
         return ''
-    if re.fullmatch(r'ㅎ+', token):
-        return ''
 
-    # '개' 단독 토큰: 뒤에 감정/상태 형용사가 오면 '매우', 아니면 그대로
+    # '개' 단독 토큰: whitelist 형용사 앞에만 '매우'
     if token == '개':
         if next_token and _ADJ_PAT.search(next_token):
             return '매우'
@@ -404,18 +380,16 @@ def disambiguate_token(
     if token in ('진짜', '진쨔', '진짜로'):
         return '정말' if token != '진짜로' else '정말로'
 
-    # 사전 조회: longest-match (접두 슬랭 + 나머지 어미 처리)
+    # 사전 조회
     if token in SLANG_DICT:
         return SLANG_DICT[token]
 
-    # 복합 토큰: 슬랭 사전 키가 token의 접두사인 경우
-    # 단, 키가 자모(ㄱ-ㅎ)이거나 명확한 슬랭(2자 이상 + 나머지 2자 이상)일 때만 적용
+    # 복합 토큰: 자모 키이거나 나머지가 2자 이상일 때만 적용 (핵심→매우심 방지)
     best_match_len = 0
     best_replacement = None
     for key, val in SLANG_DICT.items():
         if token.startswith(key) and len(key) > best_match_len:
             remainder = token[len(key):]
-            # 자모 키이거나, 나머지가 2자 이상일 때만 적용 (핵심→매우심 방지)
             is_jamo_key = re.fullmatch(r'[ㄱ-ㅎㅏ-ㅣ]+', key)
             if is_jamo_key or len(remainder) >= 2:
                 best_match_len = len(key)
