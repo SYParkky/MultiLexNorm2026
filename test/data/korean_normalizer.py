@@ -32,6 +32,7 @@ SLANG_DICT = {
     '존내': '매우',
     '겁나': '매우',
     '겁내': '매우',
+    '넘': '너무',
     '너모': '너무',
     '졸라': '매우',
     '쫌': '조금',
@@ -39,8 +40,6 @@ SLANG_DICT = {
     '아무튼간에': '아무튼',
     '어쨌든간': '어쨌든',
     '하여튼': '아무튼',
-    '진쨔': '진짜',
-    '진짜임': '진짜야',
     '레알': '정말',
     'ㄹㅇ': '정말',
     '리얼': '정말',
@@ -103,7 +102,7 @@ SLANG_DICT = {
     '왤케': '왜 이렇게',
     '왤캐': '왜 이렇게',
     '왜케': '왜 이렇게',
-    '뭔': '무엇인',
+    '뭔': '무슨',
     '머야': '뭐야',
     '머임': '뭐야',
     '머': '뭐',
@@ -163,7 +162,6 @@ SLANG_DICT = {
     '현타': '현실감',
     '소름돋': '소름 돋아',
     '소름돋아': '소름 돋아',
-    '핵': '매우',
     'TMI': '불필요한 정보',
     'tmi': '불필요한 정보',
 
@@ -218,16 +216,23 @@ SLANG_DICT = {
 # 2. PREFIX RULES (형태소 내부 접두사)
 # ═══════════════════════════════════════════════════════════════
 
+# 접두사 규칙: 감정/상태 형용사 앞에만 적용 (명사 오적용 방지)
+# whitelist: 2자 이상 형용사 어간만 허용
+_ADJ_WHITELIST = (
+    '좋아|좋은|좋다|웃겨|웃긴|웃기|귀여|슬퍼|슬픈|힘들|빠르|느리|맛있|맛없|예뻐|예쁜|예쁘|별로|재미|많이|크다|작다|높다|낮다|쉽|어렵|무서|싫어|춥|덥'
+)
+_ADJ_PAT = re.compile(rf'^(?:{_ADJ_WHITELIST})')
+
 PREFIX_RULES = [
-    # (regex 패턴, 교체 접두사)
-    # 최소 2글자 이상 남아야 의미 있음
-    (re.compile(r'^개(?=[가-힣]{2,})'), '매우 '),
+    # 존나/존내/겁나 — 단독 강조 부사로만 쓰이므로 그대로 적용
     (re.compile(r'^존나(?=[가-힣]{2,})'), '매우 '),
     (re.compile(r'^존내(?=[가-힣]{2,})'), '매우 '),
-    (re.compile(r'^핵(?=[가-힣]{2,})'), '매우 '),
     (re.compile(r'^겁나(?=[가-힣]{2,})'), '매우 '),
+    # 개/핵/진짜 — whitelist 형용사 앞에만 적용
+    (re.compile(rf'^개(?={_ADJ_WHITELIST})'), '매우 '),
+    (re.compile(rf'^핵(?={_ADJ_WHITELIST})'), '매우 '),
+    (re.compile(rf'^진짜(?={_ADJ_WHITELIST})'), '정말 '),
     (re.compile(r'^ㄹㅇ(?=[가-힣]{2,})'), '정말 '),
-    (re.compile(r'^진짜(?=[가-힣]{2,})'), '정말 '),
 ]
 
 
@@ -389,30 +394,32 @@ def disambiguate_token(
     if re.fullmatch(r'ㅎ+', token):
         return ''
 
-    # '개' 단독 토큰: 뒤에 한글이 오면 '매우', 아니면 그대로
+    # '개' 단독 토큰: 뒤에 감정/상태 형용사가 오면 '매우', 아니면 그대로
     if token == '개':
-        if next_token and re.search(r'[가-힣]', next_token):
+        if next_token and _ADJ_PAT.search(next_token):
             return '매우'
         return token
 
-    # '모' → 다음 토큰이 '르'로 시작하면 그대로 (모르겠어)
-    if token == '모':
-        if next_token and next_token.startswith('르'):
-            return token
-        return '뭐'
+    # '진짜/진쨔' 단독 토큰 → '정말'
+    if token in ('진짜', '진쨔', '진짜로'):
+        return '정말' if token != '진짜로' else '정말로'
 
     # 사전 조회: longest-match (접두 슬랭 + 나머지 어미 처리)
     if token in SLANG_DICT:
         return SLANG_DICT[token]
 
-    # 복합 토큰: 슬랭 사전 키 중 token의 접두사로 매치되는 것 탐색
-    # 예: '존맛탱이에요' → '존맛탱'(매치) + '이에요'(나머지)
+    # 복합 토큰: 슬랭 사전 키가 token의 접두사인 경우
+    # 단, 키가 자모(ㄱ-ㅎ)이거나 명확한 슬랭(2자 이상 + 나머지 2자 이상)일 때만 적용
     best_match_len = 0
     best_replacement = None
     for key, val in SLANG_DICT.items():
         if token.startswith(key) and len(key) > best_match_len:
-            best_match_len = len(key)
-            best_replacement = val
+            remainder = token[len(key):]
+            # 자모 키이거나, 나머지가 2자 이상일 때만 적용 (핵심→매우심 방지)
+            is_jamo_key = re.fullmatch(r'[ㄱ-ㅎㅏ-ㅣ]+', key)
+            if is_jamo_key or len(remainder) >= 2:
+                best_match_len = len(key)
+                best_replacement = val
     if best_replacement is not None:
         remainder = token[best_match_len:]
         return best_replacement + remainder
@@ -527,7 +534,7 @@ def normalize_comment(text: str) -> str:
 # 12. DATASET BUILDER
 # ═══════════════════════════════════════════════════════════════
 
-def build_dataset(comments: list, max_samples: int = 1500) -> list:
+def build_dataset(comments: list, max_samples: int = 5000) -> list:
     dataset = []
     seen = set()
 
