@@ -527,7 +527,7 @@ def normalize_comment(text: str) -> str:
 # 12. DATASET BUILDER
 # ═══════════════════════════════════════════════════════════════
 
-def build_dataset(comments: list, max_samples: int = 5000) -> list:
+def build_dataset(comments: list, max_samples: int = 1500) -> list:
     dataset = []
     seen = set()
 
