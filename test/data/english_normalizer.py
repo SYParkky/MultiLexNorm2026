@@ -339,67 +339,9 @@ def build_dataset(comments, max_samples=5000):
 
     return dataset
 
-# ═══════════════════════════════════════════════════════
-# 12. TESTS
-# ═══════════════════════════════════════════════════════
-
-TEST_CASES = [
-
-    (
-        "broooo this vid is fireeee 🔥🔥",
-        "bro this video is great"
-    ),
-
-
-    (
-        "plssss upload more vids!!",
-        "please upload more videos!"
-    ),
-
-    (
-        "idk why ppl hate this lol",
-        "I don't know why people hate this laugh out loud"
-    ),
-
-    (
-        "fkkkk this game is mid",
-        "fuck this game is average"
-    ),
-
-    (
-        "omgggg this is goated frfr",
-        "oh my god this is great for real"
-    ),
-]
-
-def run_tests():
-
-    print("\n" + "="*60)
-    print("SELF TEST")
-    print("="*60)
-
-    passed = 0
-
-    for raw, expected in TEST_CASES:
-
-        result = normalize_comment(raw)
-
-        ok = result == expected
-
-        if ok:
-            passed += 1
-
-        status = "✓" if ok else "✗"
-
-        print(f"{status} RAW : {raw}")
-        print(f"  OUT : {result}")
-        print(f"  EXP : {expected}")
-        print()
-
-    print(f"Passed: {passed}/{len(TEST_CASES)}")
 
 # ═══════════════════════════════════════════════════════
-# 13. MAIN
+# 12. MAIN
 # ═══════════════════════════════════════════════════════
 
 if __name__ == "__main__":
@@ -420,4 +362,4 @@ if __name__ == "__main__":
 
     print("Saved -> english_normalized.jsonl")
 
-    run_tests()
+   
