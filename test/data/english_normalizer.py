@@ -122,7 +122,7 @@ SLANG_DICT = {
     "np": "no problem",
     "omw": "on my way",
     "wdym": "what do you mean",
-    "wym": "what do you mean",,
+    "wym": "what do you mean",
     "brb": "be right back",
     "ttyl": "talk to you later",
 
