@@ -65,8 +65,6 @@ SLANG_DICT = {
 
     # internet slang
     "goated": "great",
-    "fire": "great",
-    "mid": "average",
 
     # abbreviations
     "rn": "right now",
@@ -128,6 +126,31 @@ ELONGATED_WORDS = {
 
     "lolll": "lol",
     "lmfaooo": "lmfao",
+}
+
+CONTRACTIONS = {
+
+    "im": "i'm",
+    "ive": "i've",
+
+
+    "dont": "don't",
+    "cant": "can't",
+    "couldnt": "couldn't",
+    "wouldnt": "wouldn't",
+    "shouldnt": "shouldn't",
+
+    "wont": "won't",
+    "isnt": "isn't",
+    "arent": "aren't",
+    "wasnt": "wasn't",
+    "werent": "weren't",
+
+    "didnt": "didn't",
+    "doesnt": "doesn't",
+
+    "youre": "you're",
+    "theyre": "they're",
 }
 
 # ═══════════════════════════════════════════════════════
@@ -255,6 +278,10 @@ def normalize_token(token):
         lower = ELONGATED_WORDS[lower]
     
     lower = normalize_repeated_chars(lower)  # 순서 변경
+
+    # contractions
+    if lower in CONTRACTIONS:
+        return CONTRACTIONS[lower]
     
     if lower in SLANG_DICT:
         return SLANG_DICT[lower]
