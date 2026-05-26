@@ -249,24 +249,17 @@ def normalize_repeated_chars(word):
 # ═══════════════════════════════════════════════════════
 
 def normalize_token(token):
-
-    token = normalize_repeated_chars(token)
-
     lower = token.lower()
-
-    # elongated dictionary
+    
     if lower in ELONGATED_WORDS:
         lower = ELONGATED_WORDS[lower]
-
-    # slang dictionary
+    
+    lower = normalize_repeated_chars(lower)  # 순서 변경
+    
     if lower in SLANG_DICT:
         return SLANG_DICT[lower]
-
-    # elongated normalized result
-    if lower != token.lower():
-        return lower
-
-    return token
+    
+    return lower  # 항상 정규화된 결과 반환
 
 # ═══════════════════════════════════════════════════════
 # 10. MAIN NORMALIZATION
