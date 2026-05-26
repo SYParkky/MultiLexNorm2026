@@ -51,8 +51,6 @@ SLANG_DICT = {
     "omg": "oh my god",
 
     # people
-    "bro": "friend",
-    "bruh": "friend",
     "u": "you",
     "ur": "your",
     "ya": "you",
@@ -109,7 +107,7 @@ SLANG_DICT = {
 ELONGATED_WORDS = {
 
     "brooo": "bro",
-    "broo" : "bro',
+    "broo" : "bro",
     "broooo": "bro",
 
     "nahhh": "nah",
