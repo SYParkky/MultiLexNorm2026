@@ -269,8 +269,6 @@ PHRASE_RULES = [
     ('존귀', '정말 귀여워'),
 
     ('ㄹㅇ 개', '정말 매우'),
-    ('진짜 개', '정말 매우'),
-    ('진짜 존나', '정말 매우'),
 
     ('왤케 좋아', '왜 이렇게 좋아'),
     ('왤케 웃겨', '왜 이렇게 웃겨'),
@@ -358,7 +356,7 @@ def disambiguate_token(
 
     # '진짜/진쨔' 단독 토큰 → '정말'
     if token in ('진짜', '진쨔', '진짜로'):
-        return '정말' if token != '진짜로' else '정말로'
+        return '진짜' if token != '진짜로' else '진짜로'
 
     # 사전 조회 (exact match)
     if token in SLANG_DICT:
