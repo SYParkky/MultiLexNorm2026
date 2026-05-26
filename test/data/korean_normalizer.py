@@ -458,7 +458,7 @@ def normalize_comment(text: str) -> str:
 # 11. DATASET BUILDER
 # ═══════════════════════════════════════════════════════════════
 
-def build_dataset(comments: list, max_samples: int = 5000) -> list:
+def build_dataset(comments: list, max_samples: int = 10000) -> list:
     dataset = []
     seen = set()
 
@@ -546,7 +546,7 @@ def main():
     )
     parser.add_argument('--input', type=str, default='youtube_comments.json')
     parser.add_argument('--output', type=str, default='real_yt_normalization.jsonl')
-    parser.add_argument('--samples', type=int, default=5000)
+    parser.add_argument('--samples', type=int, default=10000)
     parser.add_argument('--test', action='store_true', help='Run self-tests')
     args = parser.parse_args()
 
