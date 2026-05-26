@@ -360,7 +360,7 @@ def build_dataset(comments, max_samples=10000):
 
 if __name__ == "__main__":
 
-    with open("youtube_comments_en.json", "r", encoding="utf-8") as f:
+    with open("youtube_comments_en (1).json", "r", encoding="utf-8") as f:
         comments = json.load(f)
 
     print(f"Loaded comments: {len(comments)}")
