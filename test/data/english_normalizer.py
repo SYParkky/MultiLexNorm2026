@@ -9,7 +9,7 @@ Features:
   4. Repeated-character normalization
   5. Elongated typo normalization
   6. YouTube cleanup
-  7. Safe normalization (avoid overnormalizing)
+  7. Safe normalization
 """
 
 import json
@@ -42,8 +42,8 @@ SLANG_DICT = {
     # laughing
     "lmao": "laughing my ass off",
     "lmfao": "laughing my fucking ass off",
-    "lol": "laugh out loud",
-    "rofl": "rolling on the floorlaughing",
+    "lol": "laughing out loud",
+    "rofl": "rolling on the floor laughing",
 
     # expressions
     "wtf": "what the fuck",
@@ -68,7 +68,7 @@ SLANG_DICT = {
     "fire": "great",
     "mid": "average",
 
-    # common abbreviations
+    # abbreviations
     "rn": "right now",
     "bc": "because",
     "ppl": "people",
@@ -91,7 +91,7 @@ SLANG_DICT = {
     "sorta": "sort of",
     "tho": "though",
 
-    # common misspellings
+    # misspellings
     "definately": "definitely",
     "definetly": "definitely",
     "seperate": "separate",
@@ -107,26 +107,21 @@ SLANG_DICT = {
 ELONGATED_WORDS = {
 
     "brooo": "bro",
-    "broo" : "bro",
     "broooo": "bro",
 
     "nahhh": "nah",
-    "nahh": "nah",
     "nahhhh": "nah",
 
     "yesss": "yes",
-    "yess" : "yes",
     "yessss": "yes",
 
     "noooo": "no",
-    "noo" : "no",
     "nooooo": "no",
 
     "plsss": "please",
-    "plss" : "please",
     "plssss": "please",
-    "plzz" : "please",
-    "plzzz" : "please",
+    "plzz": "please",
+    "plzzz": "please",
 
     "omggg": "omg",
     "omgggg": "omg",
@@ -168,7 +163,7 @@ YOUTUBE_PATTERNS = [
 PROFANITY_PATTERNS = [
 
     # fuck
-    (re.compile(r'\bf+u+c+k+\b', re.I), 'fuck'),
+    (re.compile(r'\bf+u*c*k+\b', re.I), 'fuck'),
     (re.compile(r'\bf+k+\b', re.I), 'fuck'),
     (re.compile(r'\bf+u+k+\b', re.I), 'fuck'),
     (re.compile(r'\bf+u+c+c+\b', re.I), 'fuck'),
@@ -210,7 +205,7 @@ def is_valid_comment(text):
 
     text = text.strip()
 
-    if len(text) < 4 or len(text) > 160:
+    if len(text) < 4 or len(text) > 200:
         return False
 
     if not re.search(r'[a-zA-Z]', text):
@@ -240,12 +235,12 @@ def clean_text(text):
 
 def normalize_repeated_chars(word):
 
-    # avoid short words
     if len(word) <= 3:
         return word
 
-    # compress very repeated chars
-    word = re.sub(r'(.)\1{3,}', r'\1\1', word)
+    # fireeeee -> fire
+    # broooo -> bro
+    word = re.sub(r'(.)\1{2,}', r'\1', word)
 
     return word
 
@@ -266,6 +261,10 @@ def normalize_token(token):
     # slang dictionary
     if lower in SLANG_DICT:
         return SLANG_DICT[lower]
+
+    # elongated normalized result
+    if lower != token.lower():
+        return lower
 
     return token
 
@@ -314,11 +313,7 @@ def build_dataset(comments, max_samples=5000):
         norm = normalize_comment(raw)
 
         # skip unchanged
-        if raw == norm:
-            continue
-
-        # avoid aggressive shortening
-        if len(norm) < len(raw) * 0.4:
+        if raw.lower() == norm.lower():
             continue
 
         pair = (raw, norm)
@@ -338,7 +333,6 @@ def build_dataset(comments, max_samples=5000):
             break
 
     return dataset
-
 
 # ═══════════════════════════════════════════════════════
 # 12. MAIN
@@ -361,5 +355,3 @@ if __name__ == "__main__":
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
     print("Saved -> english_normalized.jsonl")
-
-   
