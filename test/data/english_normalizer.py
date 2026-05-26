@@ -2,24 +2,25 @@
 English YouTube Comment Normalizer
 Target: MultiLexNorm English track
 
-Goals:
-  1. Normalize common internet slang
-  2. Fix lightweight typos
-  3. Remove emojis / hashtags / timestamps / mentions
-  4. Keep meaning intact
-  5. Avoid over-normalization
+Features:
+  1. Slang normalization
+  2. Abbreviation expansion
+  3. Profanity normalization
+  4. Repeated-character normalization
+  5. Elongated typo normalization
+  6. YouTube cleanup
+  7. Safe normalization
 """
 
-import re
 import json
+import re
 import random
-from typing import Optional
 
 random.seed(42)
 
-# ═══════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
 # 1. SLANG / ABBREVIATION DICTIONARY
-# ═══════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
 
 SLANG_DICT = {
 
@@ -27,62 +28,111 @@ SLANG_DICT = {
     "fr": "for real",
     "ong": "I swear",
     "idk": "I don't know",
+    "imo": "in my opinion",
+    "imho": "in my opinion",
     "tbh": "to be honest",
     "ngl": "not gonna lie",
     "irl": "in real life",
 
     # agreement
-    "fax": "facts",
-    "facts": "facts",
     "yup": "yes",
     "nah": "no",
     "nope": "no",
-    "fs" : "for sure",
 
     # laughing
     "lmao": "laughing my ass off",
     "lmfao": "laughing my fucking ass off",
-    "rofl": "rolling on the floor laughing",
     "lol": "laughing out loud",
+    "rofl": "rolling on the floor laughing",
+
+    # expressions
     "wtf": "what the fuck",
     "wth": "what the hell",
-    "nvm": "never mind",
+    "omg": "oh my god",
 
     # people
     "u": "you",
     "ur": "your",
-    "tho": "though",
+    "ya": "you",
 
-    # youtube/internet
+    # youtube
     "yt": "youtube",
     "vid": "video",
-    "sub": "subscribe",
+    "vids": "videos",
     "pls": "please",
     "plz": "please",
+    "sub": "subscribe",
 
-    # expressions
-    "omg": "oh my god",
+    # internet slang
     "goated": "great",
     "fire": "great",
     "mid": "average",
 
-    # common misspellings
+    # abbreviations
+    "rn": "right now",
+    "bc": "because",
+    "ppl": "people",
+    "smh": "disappointed",
+    "idc": "I do not care",
+    "ik": "I know",
+    "ikr": "I know right",
+    "dw": "do not worry",
+    "nvm": "never mind",
+    "asap": "as soon as possible",
+    "thx": "thanks",
+    "ty": "thank you",
+    "ily": "I love you",
+
+    # casual english
+    "gonna": "going to",
+    "wanna": "want to",
+    "gotta": "have to",
+    "kinda": "kind of",
+    "sorta": "sort of",
+    "tho": "though",
+
+    # misspellings
     "definately": "definitely",
     "definetly": "definitely",
     "seperate": "separate",
     "becuz": "because",
     "cuz": "because",
     "coz": "because",
-    "thoo": "though",
-
-
 }
 
-_SORTED_KEYS = sorted(SLANG_DICT.keys(), key=len, reverse=True)
+# ═══════════════════════════════════════════════════════
+# 2. ELONGATED WORDS
+# ═══════════════════════════════════════════════════════
 
-# ═══════════════════════════════════════════════════
-# 2. YOUTUBE CLEANUP
-# ═══════════════════════════════════════════════════
+ELONGATED_WORDS = {
+
+    "brooo": "bro",
+    "broooo": "bro",
+
+    "nahhh": "nah",
+    "nahhhh": "nah",
+
+    "yesss": "yes",
+    "yessss": "yes",
+
+    "noooo": "no",
+    "nooooo": "no",
+
+    "plsss": "please",
+    "plssss": "please",
+    "plzz": "please",
+    "plzzz": "please",
+
+    "omggg": "omg",
+    "omgggg": "omg",
+
+    "lolll": "lol",
+    "lmfaooo": "lmfao",
+}
+
+# ═══════════════════════════════════════════════════════
+# 3. YOUTUBE CLEANUP
+# ═══════════════════════════════════════════════════════
 
 YOUTUBE_PATTERNS = [
 
@@ -104,39 +154,58 @@ YOUTUBE_PATTERNS = [
         r'[\U0001F300-\U0001FAFF'
         r'\U00002600-\U000027BF]+'
     ), ''),
-
 ]
 
-# ═══════════════════════════════════════════════════
-# 3. TYPO FIXES
-# ═══════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
+# 4. PROFANITY NORMALIZATION
+# ═══════════════════════════════════════════════════════
+
+PROFANITY_PATTERNS = [
+
+    # fuck
+    (re.compile(r'\bf+u*c*k+\b', re.I), 'fuck'),
+    (re.compile(r'\bf+k+\b', re.I), 'fuck'),
+    (re.compile(r'\bf+u+k+\b', re.I), 'fuck'),
+    (re.compile(r'\bf+u+c+c+\b', re.I), 'fuck'),
+
+    # shit
+    (re.compile(r'\bs+h+i+t+\b', re.I), 'shit'),
+    (re.compile(r'\bsh+t+\b', re.I), 'shit'),
+
+    # bitch
+    (re.compile(r'\bb+i+t+c+h+\b', re.I), 'bitch'),
+    (re.compile(r'\bb+t+c+h+\b', re.I), 'bitch'),
+
+    # damn
+    (re.compile(r'\bd+a+m+n+\b', re.I), 'damn'),
+]
+
+# ═══════════════════════════════════════════════════════
+# 5. TYPO PATTERNS
+# ═══════════════════════════════════════════════════════
 
 TYPO_PATTERNS = [
 
-    # repeated punctuation
+    # punctuation
     (re.compile(r'[!]{2,}'), '!'),
     (re.compile(r'[?]{2,}'), '?'),
 
-    # stretched words
-    (re.compile(r'(.)\1{3,}'), r'\1\1'),
-
-    # spacing
+    # whitespace
     (re.compile(r'\s+'), ' '),
-
 ]
 
-# ═══════════════════════════════════════════════════
-# 4. VALIDATION
-# ═══════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
+# 6. VALIDATION
+# ═══════════════════════════════════════════════════════
 
-def is_valid_comment(text: str) -> bool:
+def is_valid_comment(text):
 
     if not isinstance(text, str):
         return False
 
     text = text.strip()
 
-    if len(text) < 4 or len(text) > 160:
+    if len(text) < 4 or len(text) > 200:
         return False
 
     if not re.search(r'[a-zA-Z]', text):
@@ -144,11 +213,11 @@ def is_valid_comment(text: str) -> bool:
 
     return True
 
-# ═══════════════════════════════════════════════════
-# 5. CLEAN TEXT
-# ═══════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
+# 7. CLEAN TEXT
+# ═══════════════════════════════════════════════════════
 
-def clean_text(text: str) -> str:
+def clean_text(text):
 
     text = text.strip()
 
@@ -160,31 +229,49 @@ def clean_text(text: str) -> str:
 
     return text.strip()
 
-# ═══════════════════════════════════════════════════
-# 6. TOKEN NORMALIZATION
-# ═══════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
+# 8. REPEATED CHARACTER NORMALIZATION
+# ═══════════════════════════════════════════════════════
 
-def normalize_token(token: str) -> str:
+def normalize_repeated_chars(word):
 
+    if len(word) <= 3:
+        return word
+
+    # fireeeee -> fire
+    # broooo -> bro
+    word = re.sub(r'(.)\1{2,}', r'\1', word)
+
+    return word
+
+# ═══════════════════════════════════════════════════════
+# 9. TOKEN NORMALIZATION
+# ═══════════════════════════════════════════════════════
+
+def normalize_token(token):
     lower = token.lower()
-
-    # exact match
+    
+    if lower in ELONGATED_WORDS:
+        lower = ELONGATED_WORDS[lower]
+    
+    lower = normalize_repeated_chars(lower)  # 순서 변경
+    
     if lower in SLANG_DICT:
         return SLANG_DICT[lower]
+    
+    return lower  # 항상 정규화된 결과 반환
 
-    # don't overnormalize short words
-    if len(token) <= 2:
-        return token
+# ═══════════════════════════════════════════════════════
+# 10. MAIN NORMALIZATION
+# ═══════════════════════════════════════════════════════
 
-    return token
-
-# ═══════════════════════════════════════════════════
-# 7. MAIN NORMALIZATION
-# ═══════════════════════════════════════════════════
-
-def normalize_comment(text: str) -> str:
+def normalize_comment(text):
 
     norm = clean_text(text)
+
+    # profanity normalization
+    for pattern, replacement in PROFANITY_PATTERNS:
+        norm = pattern.sub(replacement, norm)
 
     tokens = norm.split()
 
@@ -200,9 +287,9 @@ def normalize_comment(text: str) -> str:
 
     return norm
 
-# ═══════════════════════════════════════════════════
-# 8. DATASET BUILDER
-# ═══════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
+# 11. DATASET BUILDER
+# ═══════════════════════════════════════════════════════
 
 def build_dataset(comments, max_samples=5000):
 
@@ -219,11 +306,7 @@ def build_dataset(comments, max_samples=5000):
         norm = normalize_comment(raw)
 
         # skip unchanged
-        if raw == norm:
-            continue
-
-        # avoid extreme shortening
-        if len(norm) < len(raw) * 0.4:
+        if raw.lower() == norm.lower():
             continue
 
         pair = (raw, norm)
@@ -244,26 +327,25 @@ def build_dataset(comments, max_samples=5000):
 
     return dataset
 
-# ═══════════════════════════════════════════════════
-# 9. TESTS
-# ═══════════════════════════════════════════════════
-#skip
-
-# ═══════════════════════════════════════════════════
-# 10. MAIN
-# ═══════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
+# 12. MAIN
+# ═══════════════════════════════════════════════════════
 
 if __name__ == "__main__":
 
-    with open("youtube_comments.json", "r", encoding="utf-8") as f:
+    with open("youtube_comments_en.json", "r", encoding="utf-8") as f:
         comments = json.load(f)
 
-    dataset = build_dataset(comments)
+    print(f"Loaded comments: {len(comments)}")
 
-    with open("english_normalized.jsonl", "w", encoding="utf-8") as f:
-        for row in dataset:
-            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+    dataset = build_dataset(comments, max_samples=5000)
 
     print(f"Built dataset: {len(dataset)}")
 
+    with open("english_normalized.jsonl", "w", encoding="utf-8") as f:
+
+        for row in dataset:
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+    print("Saved -> english_normalized.jsonl")
 
