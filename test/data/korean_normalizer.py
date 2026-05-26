@@ -7,9 +7,8 @@ Strategy:
   2. Morpheme-aware: prefix pattern matching (개-, 존나-, etc.)
   3. Context-aware: position-sensitive disambiguation
   4. YouTube-specific: timestamps, @tags, hashtags, emoji removal
-  5. Jamo decomposition: systematic filler handling
-  6. Suffix normalization: 구어체 어미 교정
-  7. Typo correction: 됬→됐 등 표준 오타
+  5. Suffix normalization: 구어체 어미 교정
+  6. Typo correction: 됬→됐 등 표준 오타
 """
 
 import json
@@ -97,9 +96,6 @@ SLANG_DICT = {
     'ㅊㅋㅊㅋ': '축하해',
 
     # ── 감탄/놀람 ────────────────────────────────────────────────
-    'ㄷㄷ': '대단해',
-    'ㄷㄷㄷ': '대단해',
-    'ㅎㄷㄷ': '대단해',
     '헐': '어머',
     '대박': '굉장해',
     '대박이다': '굉장하다',
@@ -224,7 +220,6 @@ SLANG_DICT = {
 }
 
 # 사전 키를 길이 내림차순으로 정렬해 longest-match 매칭 보장
-# (예: '레전드'가 '레전'보다 먼저 매칭되는 오류 방지)
 _SORTED_SLANG_KEYS = sorted(SLANG_DICT.keys(), key=len, reverse=True)
 
 
@@ -232,18 +227,15 @@ _SORTED_SLANG_KEYS = sorted(SLANG_DICT.keys(), key=len, reverse=True)
 # 2. PREFIX RULES (형태소 내부 접두사)
 # ═══════════════════════════════════════════════════════════════
 
-# 접두사 규칙: 형용사 어간 whitelist 앞에만 적용 (오적용 방지)
 _ADJ_WHITELIST = (
     '좋아|좋은|좋다|웃겨|웃긴|웃기|귀여|슬퍼|슬픈|힘들|빠르|느리|맛있|맛없|예뻐|예쁜|예쁘|별로|재미|많이|크다|작다|높다|낮다|쉽|어렵|무서|싫어|춥|덥'
 )
 _ADJ_PAT = re.compile(rf'^(?:{_ADJ_WHITELIST})')
 
 PREFIX_RULES = [
-    # 존나/존내/겁나 — 단독 강조 부사이므로 그대로 적용
     (re.compile(r'^존나(?=[가-힣]{2,})'), '매우 '),
     (re.compile(r'^존내(?=[가-힣]{2,})'), '매우 '),
     (re.compile(r'^겁나(?=[가-힣]{2,})'), '매우 '),
-    # 개/핵 — whitelist 형용사 앞에만 적용
     (re.compile(rf'^개(?={_ADJ_WHITELIST})'), '매우 '),
     (re.compile(rf'^핵(?={_ADJ_WHITELIST})'), '매우 '),
     (re.compile(r'^ㄹㅇ(?=[가-힣]{2,})'), '정말 '),
@@ -314,12 +306,6 @@ YOUTUBE_PATTERNS = [
 # 5. TYPO CORRECTION (정규표현식 기반)
 # ═══════════════════════════════════════════════════════════════
 
-# 자모 suffix 제거 패턴 (한글 뒤에 붙은 의미없는 자모)
-JAMO_SUFFIX_PATTERN = re.compile(r'(?<=[가-힣])[ㄱ-ㅎ]+$')
-
-# 한글 뒤에 붙은 ㅠ/ㅜ 제거 (예: 좋다ㅠㅠ → 좋다)
-JAMO_VOWEL_SUFFIX_PATTERN = re.compile(r'(?<=[가-힣])[ㅠㅜ]+')
-
 TYPO_PATTERNS = [
     # 됬 → 됐
     (re.compile(r'됬'), '됐'),
@@ -368,14 +354,6 @@ def disambiguate_token(
     next_token: Optional[str]
 ) -> str:
 
-    # 자모 필러: 단독 ㅠ+/ㅜ+ 토큰 → 제거
-    if re.fullmatch(r'[ㅠㅜ]+', token):
-        return ''
-    if re.fullmatch(r'ㄷ+', token):
-        if token in SLANG_DICT:
-            return SLANG_DICT[token]
-        return ''
-
     # '개' 단독 토큰: whitelist 형용사 앞에만 '매우'
     if token == '개':
         if next_token and _ADJ_PAT.search(next_token):
@@ -391,13 +369,10 @@ def disambiguate_token(
         return SLANG_DICT[token]
 
     # 복합 토큰: longest-match로 접두 슬랭 처리
-    # BUG FIX: _SORTED_SLANG_KEYS(길이 내림차순)로 순회해
-    #          '레전드'가 '레전'보다 먼저 매칭되는 오류 방지
     for key in _SORTED_SLANG_KEYS:
         if token.startswith(key) and len(key) < len(token):
             remainder = token[len(key):]
             is_jamo_key = re.fullmatch(r'[ㄱ-ㅎㅏ-ㅣ]+', key)
-            # BUG FIX: remainder 1글자도 허용 (개꿀잼임 등)
             if is_jamo_key or len(remainder) >= 1:
                 return SLANG_DICT[key] + remainder
 
@@ -417,14 +392,6 @@ def apply_prefix_rules(token: str) -> str:
     return token
 
 
-def strip_jamo_suffix(token: str) -> str:
-    # 한글 뒤 자음 자모 제거
-    token = JAMO_SUFFIX_PATTERN.sub('', token)
-    # 한글 뒤 모음 자모(ㅠ/ㅜ) 제거
-    token = JAMO_VOWEL_SUFFIX_PATTERN.sub('', token)
-    return token
-
-
 # ═══════════════════════════════════════════════════════════════
 # 8. VALIDATION
 # ═══════════════════════════════════════════════════════════════
@@ -437,7 +404,6 @@ def is_valid_comment(text: str) -> bool:
         return False
     if not re.search(r'[가-힣]', text):
         return False
-    # 의미없는 자모만으로 구성
     if re.fullmatch(r'[ㄱ-ㅎㅏ-ㅣ\s!?~.]+', text):
         return False
     return True
@@ -474,10 +440,9 @@ def normalize_comment(text: str) -> str:
     for pattern, replacement in TYPO_PATTERNS:
         norm = pattern.sub(replacement, norm)
 
-    # Step 3: Prefix morpheme rules + trailing jamo cleanup
+    # Step 3: Prefix morpheme rules
     tokens = norm.split()
     tokens = [apply_prefix_rules(t) for t in tokens]
-    tokens = [strip_jamo_suffix(t) for t in tokens]
     norm = ' '.join(tokens)
 
     # Step 4: Context-aware token normalization
@@ -491,10 +456,7 @@ def normalize_comment(text: str) -> str:
         )
     norm = ' '.join(t for t in result_tokens if t)
 
-    # Step 5: Remove residual jamo fillers
-    norm = re.sub(r'ㄷ{3,}', '', norm)
-
-    # Step 6: Final whitespace cleanup
+    # Step 5: Final whitespace cleanup
     norm = re.sub(r'\s+', ' ', norm).strip()
 
     return norm
@@ -522,7 +484,6 @@ def build_dataset(comments: list, max_samples: int = 5000) -> list:
         if len(norm.strip()) < 3:
             continue
 
-        # 과도한 삭제 방지 (원문의 30% 미만으로 줄어들면 skip)
         if len(norm) < len(raw) * 0.3:
             continue
 
@@ -549,15 +510,15 @@ def build_dataset(comments: list, max_samples: int = 5000) -> list:
 
 TEST_CASES = [
     # (raw, expected_norm)
-    ("개웃긴데ㅋㅋㅋ 진짜", "매우 웃긴데 정말"),
-    ("ㄹㅇ 존나 좋다ㅠㅠ", "정말 매우 좋다"),
+    ("개웃긴데ㅋㅋㅋ 진짜", "매우 웃긴데ㅋㅋㅋ 정말"),
+    ("ㄹㅇ 존나 좋다ㅠㅠ", "정말 매우 좋다ㅠㅠ"),
     ("왤케 이뻐요 진짜 레알", "왜 이렇게 예뻐요 정말 정말"),
     ("됬다 이제 다왔네 ㄱㅊ", "됐다 이제 다왔네 괜찮아"),
-    ("귀엽당ㅠㅠ 진짜 개귀여워", "귀엽다 정말 매우 귀여워"),
-    ("1:23 여기서 소름ㄷㄷ 대박이다", "여기서 소름 굉장하다"),
+    ("귀엽당ㅠㅠ 진짜 개귀여워", "귀엽다ㅠㅠ 정말 매우 귀여워"),
+    ("1:23 여기서 소름ㄷㄷ 대박이다", "여기서 소름ㄷㄷ 굉장하다"),
     ("구독각이다 ㄱㅅ", "구독해야겠어이다 고마워"),
-    ("ㄷㄷ 존나 쩐다 레전드네", "대단해 매우 굉장하다 전설네"),
-    ("꿀잼ㅋㅋ 개웃겨 ㄹㅇ", "재미있어 매우 웃겨 정말"),
+    ("존나 쩐다 레전드네", "매우 굉장하다 전설네"),
+    ("꿀잼ㅋㅋ 개웃겨 ㄹㅇ", "재미있어ㅋㅋ 매우 웃겨 정말"),
     ("존맛탱이에용 또 먹고싶다", "정말 맛있어이에요 또 먹고싶다"),
     ("ㅇㅇ 맞아 개꿀잼임", "응 맞아 매우 재미있어임"),
     ("감사해용 진짜 최애곡이에용", "감사해요 정말 가장 좋아하는 노래이에요"),
@@ -618,7 +579,6 @@ def main():
         print(f'RAW : {x["raw"]}')
         print(f'NORM: {x["norm"]}')
         print()
-
 
 if __name__ == '__main__':
     main()
