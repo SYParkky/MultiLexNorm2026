@@ -296,7 +296,7 @@ def run_tests():
 
 if __name__ == "__main__":
 
-    with open("youtube_comments.json", "r", encoding="utf-8") as f:
+    with open("youtube_comments_en.json", "r", encoding="utf-8") as f:
         comments = json.load(f)
 
     dataset = build_dataset(comments)
