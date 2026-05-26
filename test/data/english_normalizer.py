@@ -41,12 +41,12 @@ SLANG_DICT = {
     "nope": "no",
 
     # laughing
-    "lmao": "laughing",
-    "lmfao": "laughing",
-    "rofl": "laughing",
+    "lmao": "laughing my ass off",
+    "lmfao": "laughing my ass off",
+    "rofl": "rolling on the floor laughing",
     "lol": "laughing",
-    "wtf": "what",
-    "wth": "what",
+    "wtf": "what the hell",
+    "wth": "what the hell",
 
     # people
     "u": "you",
