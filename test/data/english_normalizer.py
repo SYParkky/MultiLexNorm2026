@@ -318,7 +318,7 @@ def normalize_comment(text):
 # 11. DATASET BUILDER
 # ═══════════════════════════════════════════════════════
 
-def build_dataset(comments, max_samples=5000):
+def build_dataset(comments, max_samples=10000):
 
     dataset = []
     seen = set()
@@ -365,7 +365,7 @@ if __name__ == "__main__":
 
     print(f"Loaded comments: {len(comments)}")
 
-    dataset = build_dataset(comments, max_samples=5000)
+    dataset = build_dataset(comments, max_samples=10000)
 
     print(f"Built dataset: {len(dataset)}")
 
