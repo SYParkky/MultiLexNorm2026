@@ -1,3 +1,16 @@
+"""
+Korean YouTube Comment Normalizer
+Target: MultiLexNorm Korean track
+
+Strategy:
+  1. Rule-based: comprehensive slang/abbreviation dictionary
+  2. Morpheme-aware: prefix pattern matching (개-, 존나-, etc.)
+  3. Context-aware: position-sensitive disambiguation
+  4. YouTube-specific: timestamps, @tags, hashtags, emoji removal
+  5. Suffix normalization: 구어체 어미 교정
+  6. Typo correction: 됬→됐 등 표준 오타
+"""
+
 import json
 import re
 import random
