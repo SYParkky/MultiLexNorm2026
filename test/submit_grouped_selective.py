@@ -1,37 +1,25 @@
-# ===== submit_grouped_mfr.py =====
-# grouped 모델 + MFR 하이브리드 + Confidence Threshold 후처리
+# ===== submit_grouped_selective.py =====
+# grouped 모델 + MFR 후처리 (th/ja/ko만)
 # test split 예측 → predictions.json → zip → CodaBench 제출용
 
 from transformers import T5ForConditionalGeneration, AutoTokenizer
 from datasets import load_dataset
 from huggingface_hub import login
 from collections import defaultdict, Counter
+import pandas as pd
 import torch
-import torch.nn.functional as F
 import os
 import zipfile
 import json
 
 # ===== 1. Login =====
-login(token="")
+login(token=" ")
 
 # ===== 2. Config =====
 BATCH_SIZE = 256
 MAX_LEN    = 128
 BASE_DIR   = "./grouped_models"
 SAVE_PATH  = "./outputs/submission_dev"
-
-# 그룹별 후처리 파라미터
-GROUP_POSTPROCESS = {
-    "germanic": {"use_mfr": False, "use_conf": False, "mfr_threshold": 0.3, "conf_threshold": 0.5},
-    "slav":     {"use_mfr": False, "use_conf": False, "mfr_threshold": 0.3, "conf_threshold": 0.5},
-    "sea":      {"use_mfr": False, "use_conf": False, "mfr_threshold": 0.3, "conf_threshold": 0.5},
-    "ja":       {"use_mfr": True,  "use_conf": False, "mfr_threshold": 0.3, "conf_threshold": 0.5},
-    "ko":       {"use_mfr": True,  "use_conf": False, "mfr_threshold": 0.3, "conf_threshold": 0.5},
-    "th":       {"use_mfr": True,  "use_conf": False, "mfr_threshold": 0.3, "conf_threshold": 0.5},
-    "romance":  {"use_mfr": False, "use_conf": False, "mfr_threshold": 0.3, "conf_threshold": 0.5},
-    "turkic":   {"use_mfr": False, "use_conf": False, "mfr_threshold": 0.3, "conf_threshold": 0.5},
-}
 
 LANG_GROUPS = {
     "germanic": ["en", "de", "nl", "da"],
@@ -44,14 +32,18 @@ LANG_GROUPS = {
     "turkic":   ["tr", "trde"],
 }
 
+# th/ja/ko만 MFR ON
+MFR_GROUPS = {"ja", "ko", "th"}
+MFR_THRESHOLD = 0.3
+
 # ===== 3. Data Load =====
 print("Loading dataset...")
 data = load_dataset("weerayut/multilexnorm2026-dev-pub")
-test_data  = data['test']
+test_df    = data['test'].to_pandas()
 train_data = data['train']
-print(f"  test sentences: {len(test_data)}")
+print(f"  test: {len(test_df)} sentences")
 
-# ===== 4. MFR 딕셔너리 빌드 =====
+# ===== 4. MFR 빌드 =====
 def build_mfr(train_data, langs):
     counts = defaultdict(Counter)
     for ex in train_data:
@@ -67,56 +59,30 @@ def build_mfr(train_data, langs):
         mfr_ratio[raw] = best_count / total
     return mfr, mfr_ratio
 
-# ===== 5. 후처리 적용 예측 =====
-def normalize_with_postprocess(raw_sent, model, tokenizer, mfr, mfr_ratio,
-                                use_mfr=True, use_conf=False,
-                                mfr_threshold=0.3, conf_threshold=0.5):
+# ===== 5. 예측 =====
+def normalize_sent(raw_sent, model, tokenizer, mfr=None, mfr_ratio=None):
     pred_sent = []
     for i in range(0, len(raw_sent), BATCH_SIZE):
         batch = raw_sent[i:i+BATCH_SIZE]
         inputs = tokenizer(
-            batch,
-            return_tensors="pt",
-            max_length=MAX_LEN,
-            truncation=True,
-            padding=True
+            batch, return_tensors="pt",
+            max_length=MAX_LEN, truncation=True, padding=True
         ).to("cuda")
-
         with torch.no_grad():
-            out = model.generate(
-                **inputs,
-                max_new_tokens=32,
-                num_beams=1,
-                output_scores=True,
-                return_dict_in_generate=True,
-            )
+            outputs = model.generate(**inputs, max_new_tokens=32)
+        preds = tokenizer.batch_decode(outputs, skip_special_tokens=True)
 
-        # confidence
-        if use_conf and out.scores:
-            confs = F.softmax(out.scores[0], dim=-1).max(dim=-1).values.tolist()
-        else:
-            confs = [1.0] * len(batch)
-
-        preds = tokenizer.batch_decode(out.sequences, skip_special_tokens=True)
-
-        for raw, pred, conf in zip(batch, preds, confs):
+        for raw, pred in zip(batch, preds):
             final = pred
-
-            # Confidence Threshold
-            if use_conf and conf < conf_threshold:
-                final = raw
-
-            # MFR 하이브리드
-            if use_mfr and final != raw:
+            if mfr and final != raw:
                 mfr_norm = mfr.get(raw, raw)
                 ratio    = mfr_ratio.get(raw, 0.0)
-                if mfr_norm == raw or ratio < mfr_threshold:
+                if mfr_norm == raw or ratio < MFR_THRESHOLD:
                     final = raw
-
             pred_sent.append(final)
     return pred_sent
 
-# ===== 6. 최신 체크포인트 탐색 =====
+# ===== 6. 체크포인트 탐색 =====
 def find_model_path(group_name):
     group_dir = os.path.join(BASE_DIR, group_name)
     final = os.path.join(group_dir, "final")
@@ -131,17 +97,15 @@ def find_model_path(group_name):
     return None
 
 # ===== 7. 그룹별 inference =====
-print("\nRunning grouped inference with post-processing...")
+print("\nRunning grouped inference...")
 tokenizer = AutoTokenizer.from_pretrained("google/byt5-base")
-
-# test 데이터를 리스트로 변환
-test_list = list(test_data)
-all_preds = [None] * len(test_list)
+all_preds = {}
 
 for group_name, langs in LANG_GROUPS.items():
-    # 해당 그룹 인덱스 추출
-    indices = [i for i, ex in enumerate(test_list) if ex['lang'] in langs]
-    if not indices:
+    mask     = test_df['lang'].isin(langs)
+    group_df = test_df[mask]
+
+    if len(group_df) == 0:
         print(f"[{group_name}] No test sentences — skipping")
         continue
 
@@ -151,61 +115,46 @@ for group_name, langs in LANG_GROUPS.items():
         continue
 
     print(f"\n[{group_name}] {model_path}")
-    print(f"  {len(indices)} sentences | langs: {langs}")
+    print(f"  sentences: {len(group_df)} ({', '.join(langs)})")
 
-    # MFR 빌드 (use_mfr=True인 그룹만)
-    gp = GROUP_POSTPROCESS.get(group_name, {"use_mfr": False, "use_conf": False,
-                                             "mfr_threshold": 0.3, "conf_threshold": 0.5})
-    if gp["use_mfr"]:
+    # MFR (th/ja/ko만)
+    use_mfr = group_name in MFR_GROUPS
+    if use_mfr:
         mfr, mfr_ratio = build_mfr(train_data, langs)
-        print(f"  MFR dict: {len(mfr)} entries")
+        print(f"  MFR dict: {len(mfr)} entries (ON)")
     else:
         mfr, mfr_ratio = None, None
+        print(f"  MFR: OFF")
 
     model = T5ForConditionalGeneration.from_pretrained(
         model_path, torch_dtype=torch.bfloat16
     ).to("cuda")
     model.eval()
 
-    for i, idx in enumerate(indices):
-        ex   = test_list[idx]
-        pred = normalize_with_postprocess(
-            list(ex['raw']), model, tokenizer, mfr, mfr_ratio,
-            use_mfr=gp["use_mfr"], use_conf=gp["use_conf"],
-            mfr_threshold=gp["mfr_threshold"], conf_threshold=gp["conf_threshold"],
-        )
+    done = 0
+    for idx, row in group_df.iterrows():
+        pred = normalize_sent(list(row['raw']), model, tokenizer, mfr, mfr_ratio)
         all_preds[idx] = pred
-        if (i+1) % 200 == 0:
-            print(f"  {i+1}/{len(indices)}")
+        done += 1
+        if done % 500 == 0:
+            print(f"  {done}/{len(group_df)} ({done/len(group_df)*100:.1f}%)")
 
-    print(f"  ✅ done")
+    print(f"  ✅ {done} sentences done")
     del model
     torch.cuda.empty_cache()
 
-# ===== 8. predictions.json 생성 =====
+# ===== 8. 저장 (원래 포맷 그대로) =====
+test_df['pred'] = test_df.index.map(lambda i: all_preds.get(i, test_df.loc[i, 'raw']))
+
 os.makedirs(SAVE_PATH, exist_ok=True)
-
-output = []
-for i, ex in enumerate(test_list):
-    pred = all_preds[i] if all_preds[i] is not None else list(ex['raw'])
-    output.append({
-        "raw":  list(ex['raw']),
-        "norm": list(ex['norm']) if 'norm' in ex else list(ex['raw']),
-        "lang": ex['lang'],
-        "pred": pred,
-    })
-
-out_path = os.path.join(SAVE_PATH, "predictions.json")
-with open(out_path, 'w', encoding='utf-8') as f:
-    json.dump(output, f, ensure_ascii=False)
-print(f"\nSaved: {out_path}")
+out = test_df[['raw', 'norm', 'lang', 'pred']]
+out.to_json(f"{SAVE_PATH}/predictions.json", orient="records")
+print(f"\nSaved: {SAVE_PATH}/predictions.json")
 
 # ===== 9. Zip =====
 zip_path = f"{SAVE_PATH}.zip"
 with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-    zipf.write(out_path, arcname="predictions.json")
-print(f"Created: {zip_path}")
-
+    zipf.write(f"{SAVE_PATH}/predictions.json", arcname="predictions.json")
+print(f"\nCreated: {zip_path}")
 print(f"\n✅ Upload to CodaBench:")
 print(f"   https://www.codabench.org/competitions/14162/?secret_key=33d4b8ec-4951-478b-8132-474e458409c3")
-print(f"\n파라미터: th/ja/ko → MFR filter ON (mfr_threshold=0.3) | germanic/slav/sea → OFF")
