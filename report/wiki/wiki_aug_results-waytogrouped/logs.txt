@@ -1,0 +1,524 @@
+(multilexnorm_env) PS C:\Users\kj556\Downloads\multilexnorm> python run_experiment.py
+
+Building validation dataset...
+  validation (ko, en, ja, de): 26828
+Map: 100%|██████████████████████████████████████████████████████████████| 26828/26828 [00:10<00:00, 2467.97 examples/s]
+
+==================================================
+EXPERIMENT A: fine-tune on original data only
+==================================================
+  train (ko, en, ja, de): 125255
+Map: 100%|████████████████████████████████████████████████████████████| 125255/125255 [00:53<00:00, 2326.27 examples/s]
+
+Training A (125255 samples, 4 epochs)...
+Loading weights: 100%|█████████████████████████████████████████████████████████████| 254/254 [00:00<00:00, 1135.18it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+[transformers] `logging_dir` is deprecated and will be removed in v5.2. Please set `TENSORBOARD_LOGGING_DIR` instead.
+{'loss': '3.397', 'grad_norm': '6.625', 'learning_rate': '0.0004968', 'epoch': '0.02555'}
+{'loss': '0.5323', 'grad_norm': '1.211', 'learning_rate': '0.0004936', 'epoch': '0.05109'}
+{'loss': '0.4642', 'grad_norm': '3.078', 'learning_rate': '0.0004905', 'epoch': '0.07664'}
+{'loss': '0.3949', 'grad_norm': '1.531', 'learning_rate': '0.0004873', 'epoch': '0.1022'}
+{'loss': '0.3704', 'grad_norm': '2.172', 'learning_rate': '0.0004841', 'epoch': '0.1277'}
+{'loss': '0.3388', 'grad_norm': '0.7891', 'learning_rate': '0.0004809', 'epoch': '0.1533'}
+{'loss': '0.3186', 'grad_norm': '1.68', 'learning_rate': '0.0004777', 'epoch': '0.1788'}
+{'loss': '0.3309', 'grad_norm': '2.703', 'learning_rate': '0.0004745', 'epoch': '0.2044'}
+{'loss': '0.2771', 'grad_norm': '1.297', 'learning_rate': '0.0004713', 'epoch': '0.2299'}
+{'loss': '0.306', 'grad_norm': '1.938', 'learning_rate': '0.0004681', 'epoch': '0.2555'}
+{'loss': '0.3474', 'grad_norm': '1.523', 'learning_rate': '0.0004649', 'epoch': '0.281'}
+{'loss': '0.2601', 'grad_norm': '1.375', 'learning_rate': '0.0004617', 'epoch': '0.3066'}
+{'loss': '0.2755', 'grad_norm': '0.4141', 'learning_rate': '0.0004585', 'epoch': '0.3321'}
+{'loss': '0.296', 'grad_norm': '0.3633', 'learning_rate': '0.0004553', 'epoch': '0.3576'}
+{'loss': '0.2591', 'grad_norm': '1.422', 'learning_rate': '0.0004521', 'epoch': '0.3832'}
+{'loss': '0.2577', 'grad_norm': '1.008', 'learning_rate': '0.0004489', 'epoch': '0.4087'}
+{'loss': '0.2249', 'grad_norm': '2.031', 'learning_rate': '0.0004458', 'epoch': '0.4343'}
+{'loss': '0.273', 'grad_norm': '0.7812', 'learning_rate': '0.0004426', 'epoch': '0.4598'}
+{'loss': '0.2732', 'grad_norm': '0.7227', 'learning_rate': '0.0004394', 'epoch': '0.4854'}
+{'loss': '0.26', 'grad_norm': '1.523', 'learning_rate': '0.0004362', 'epoch': '0.5109'}
+{'loss': '0.2662', 'grad_norm': '0.9688', 'learning_rate': '0.000433', 'epoch': '0.5365'}
+{'loss': '0.2666', 'grad_norm': '0.2051', 'learning_rate': '0.0004298', 'epoch': '0.562'}
+{'loss': '0.275', 'grad_norm': '0.4453', 'learning_rate': '0.0004266', 'epoch': '0.5876'}
+{'loss': '0.2413', 'grad_norm': '0.7969', 'learning_rate': '0.0004234', 'epoch': '0.6131'}
+{'loss': '0.2355', 'grad_norm': '2.875', 'learning_rate': '0.0004202', 'epoch': '0.6387'}
+{'loss': '0.2187', 'grad_norm': '2.5', 'learning_rate': '0.000417', 'epoch': '0.6642'}
+{'loss': '0.2216', 'grad_norm': '1.516', 'learning_rate': '0.0004138', 'epoch': '0.6897'}
+{'loss': '0.2132', 'grad_norm': '0.373', 'learning_rate': '0.0004106', 'epoch': '0.7153'}
+{'loss': '0.2298', 'grad_norm': '2.047', 'learning_rate': '0.0004074', 'epoch': '0.7408'}
+{'loss': '0.2406', 'grad_norm': '0.7695', 'learning_rate': '0.0004042', 'epoch': '0.7664'}
+{'loss': '0.2347', 'grad_norm': '0.8047', 'learning_rate': '0.0004011', 'epoch': '0.7919'}
+{'loss': '0.2335', 'grad_norm': '0.7148', 'learning_rate': '0.0003979', 'epoch': '0.8175'}
+{'loss': '0.2044', 'grad_norm': '0.8672', 'learning_rate': '0.0003947', 'epoch': '0.843'}
+{'loss': '0.2015', 'grad_norm': '1.148', 'learning_rate': '0.0003915', 'epoch': '0.8686'}
+{'loss': '0.1981', 'grad_norm': '1.375', 'learning_rate': '0.0003883', 'epoch': '0.8941'}
+{'loss': '0.2212', 'grad_norm': '0.457', 'learning_rate': '0.0003851', 'epoch': '0.9197'}
+{'loss': '0.1992', 'grad_norm': '1.242', 'learning_rate': '0.0003819', 'epoch': '0.9452'}
+{'loss': '0.2185', 'grad_norm': '0.4668', 'learning_rate': '0.0003787', 'epoch': '0.9707'}
+{'loss': '0.2492', 'grad_norm': '2.891', 'learning_rate': '0.0003755', 'epoch': '0.9963'}
+{'eval_loss': '0.079', 'eval_runtime': '22.59', 'eval_samples_per_second': '1187', 'eval_steps_per_second': '37.13', 'epoch': '1'}
+Writing model shards: 100%|██████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  1.22it/s]
+{'loss': '0.2171', 'grad_norm': '2.094', 'learning_rate': '0.0003723', 'epoch': '1.022'}
+{'loss': '0.1842', 'grad_norm': '0.4102', 'learning_rate': '0.0003691', 'epoch': '1.047'}
+{'loss': '0.1709', 'grad_norm': '0.5273', 'learning_rate': '0.0003659', 'epoch': '1.073'}
+{'loss': '0.2144', 'grad_norm': '2.656', 'learning_rate': '0.0003627', 'epoch': '1.098'}
+{'loss': '0.1739', 'grad_norm': '0.5977', 'learning_rate': '0.0003595', 'epoch': '1.124'}
+{'loss': '0.1954', 'grad_norm': '1.539', 'learning_rate': '0.0003564', 'epoch': '1.149'}
+{'loss': '0.1677', 'grad_norm': '2.094', 'learning_rate': '0.0003532', 'epoch': '1.175'}
+{'loss': '0.1996', 'grad_norm': '0.3496', 'learning_rate': '0.00035', 'epoch': '1.201'}
+{'loss': '0.1683', 'grad_norm': '2.109', 'learning_rate': '0.0003468', 'epoch': '1.226'}
+{'loss': '0.1782', 'grad_norm': '2.375', 'learning_rate': '0.0003436', 'epoch': '1.252'}
+{'loss': '0.1555', 'grad_norm': '0.9141', 'learning_rate': '0.0003404', 'epoch': '1.277'}
+{'loss': '0.1751', 'grad_norm': '1.609', 'learning_rate': '0.0003372', 'epoch': '1.303'}
+{'loss': '0.1875', 'grad_norm': '1.047', 'learning_rate': '0.000334', 'epoch': '1.328'}
+{'loss': '0.1802', 'grad_norm': '2.109', 'learning_rate': '0.0003308', 'epoch': '1.354'}
+{'loss': '0.1972', 'grad_norm': '1.992', 'learning_rate': '0.0003276', 'epoch': '1.379'}
+{'loss': '0.1751', 'grad_norm': '0.3398', 'learning_rate': '0.0003244', 'epoch': '1.405'}
+{'loss': '0.1879', 'grad_norm': '0.9922', 'learning_rate': '0.0003212', 'epoch': '1.43'}
+{'loss': '0.1775', 'grad_norm': '0.5742', 'learning_rate': '0.000318', 'epoch': '1.456'}
+{'loss': '0.155', 'grad_norm': '0.5859', 'learning_rate': '0.0003148', 'epoch': '1.482'}
+{'loss': '0.1723', 'grad_norm': '1.406', 'learning_rate': '0.0003117', 'epoch': '1.507'}
+{'loss': '0.1715', 'grad_norm': '0.334', 'learning_rate': '0.0003085', 'epoch': '1.533'}
+{'loss': '0.1727', 'grad_norm': '1.633', 'learning_rate': '0.0003053', 'epoch': '1.558'}
+{'loss': '0.1692', 'grad_norm': '2.094', 'learning_rate': '0.0003021', 'epoch': '1.584'}
+{'loss': '0.18', 'grad_norm': '0.5391', 'learning_rate': '0.0002989', 'epoch': '1.609'}
+{'loss': '0.1663', 'grad_norm': '0.2969', 'learning_rate': '0.0002957', 'epoch': '1.635'}
+{'loss': '0.1649', 'grad_norm': '0.8164', 'learning_rate': '0.0002925', 'epoch': '1.66'}
+{'loss': '0.1677', 'grad_norm': '0.5977', 'learning_rate': '0.0002893', 'epoch': '1.686'}
+{'loss': '0.186', 'grad_norm': '2.641', 'learning_rate': '0.0002861', 'epoch': '1.711'}
+{'loss': '0.1948', 'grad_norm': '0.5938', 'learning_rate': '0.0002829', 'epoch': '1.737'}
+{'loss': '0.1919', 'grad_norm': '1', 'learning_rate': '0.0002797', 'epoch': '1.763'}
+{'loss': '0.1747', 'grad_norm': '0.3945', 'learning_rate': '0.0002765', 'epoch': '1.788'}
+{'loss': '0.1548', 'grad_norm': '1.461', 'learning_rate': '0.0002733', 'epoch': '1.814'}
+{'loss': '0.1625', 'grad_norm': '1.445', 'learning_rate': '0.0002701', 'epoch': '1.839'}
+{'loss': '0.2022', 'grad_norm': '1.227', 'learning_rate': '0.000267', 'epoch': '1.865'}
+{'loss': '0.1589', 'grad_norm': '0.3652', 'learning_rate': '0.0002638', 'epoch': '1.89'}
+{'loss': '0.1788', 'grad_norm': '0.5781', 'learning_rate': '0.0002606', 'epoch': '1.916'}
+{'loss': '0.1419', 'grad_norm': '0.8008', 'learning_rate': '0.0002574', 'epoch': '1.941'}
+{'loss': '0.1898', 'grad_norm': '2.016', 'learning_rate': '0.0002542', 'epoch': '1.967'}
+{'loss': '0.1647', 'grad_norm': '1.477', 'learning_rate': '0.000251', 'epoch': '1.992'}
+{'eval_loss': '0.07174', 'eval_runtime': '22.36', 'eval_samples_per_second': '1200', 'eval_steps_per_second': '37.53', 'epoch': '2'}
+Writing model shards: 100%|██████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  1.32it/s]
+{'loss': '0.1669', 'grad_norm': '1.016', 'learning_rate': '0.0002478', 'epoch': '2.018'}
+{'loss': '0.13', 'grad_norm': '1.164', 'learning_rate': '0.0002446', 'epoch': '2.043'}
+{'loss': '0.1359', 'grad_norm': '0.3477', 'learning_rate': '0.0002414', 'epoch': '2.069'}
+{'loss': '0.1546', 'grad_norm': '0.4531', 'learning_rate': '0.0002382', 'epoch': '2.095'}
+{'loss': '0.1663', 'grad_norm': '0.793', 'learning_rate': '0.000235', 'epoch': '2.12'}
+{'loss': '0.1466', 'grad_norm': '1.164', 'learning_rate': '0.0002318', 'epoch': '2.146'}
+{'loss': '0.1468', 'grad_norm': '1.156', 'learning_rate': '0.0002286', 'epoch': '2.171'}
+{'loss': '0.1697', 'grad_norm': '0.2676', 'learning_rate': '0.0002254', 'epoch': '2.197'}
+{'loss': '0.1487', 'grad_norm': '2.078', 'learning_rate': '0.0002223', 'epoch': '2.222'}
+{'loss': '0.1325', 'grad_norm': '0.7578', 'learning_rate': '0.0002191', 'epoch': '2.248'}
+{'loss': '0.1649', 'grad_norm': '1.047', 'learning_rate': '0.0002159', 'epoch': '2.273'}
+{'loss': '0.1526', 'grad_norm': '0.3105', 'learning_rate': '0.0002127', 'epoch': '2.299'}
+{'loss': '0.177', 'grad_norm': '1.758', 'learning_rate': '0.0002095', 'epoch': '2.324'}
+{'loss': '0.1398', 'grad_norm': '1.234', 'learning_rate': '0.0002063', 'epoch': '2.35'}
+{'loss': '0.1571', 'grad_norm': '0.5469', 'learning_rate': '0.0002031', 'epoch': '2.376'}
+{'loss': '0.1602', 'grad_norm': '3.125', 'learning_rate': '0.0001999', 'epoch': '2.401'}
+{'loss': '0.1676', 'grad_norm': '1.508', 'learning_rate': '0.0001967', 'epoch': '2.427'}
+{'loss': '0.1533', 'grad_norm': '0.8828', 'learning_rate': '0.0001935', 'epoch': '2.452'}
+{'loss': '0.1859', 'grad_norm': '0.6914', 'learning_rate': '0.0001903', 'epoch': '2.478'}
+{'loss': '0.1381', 'grad_norm': '0.7305', 'learning_rate': '0.0001871', 'epoch': '2.503'}
+{'loss': '0.1503', 'grad_norm': '1.305', 'learning_rate': '0.0001839', 'epoch': '2.529'}
+{'loss': '0.1612', 'grad_norm': '1.164', 'learning_rate': '0.0001807', 'epoch': '2.554'}
+{'loss': '0.1501', 'grad_norm': '0.8867', 'learning_rate': '0.0001776', 'epoch': '2.58'}
+{'loss': '0.1219', 'grad_norm': '1.562', 'learning_rate': '0.0001744', 'epoch': '2.605'}
+{'loss': '0.1352', 'grad_norm': '1.656', 'learning_rate': '0.0001712', 'epoch': '2.631'}
+{'loss': '0.1609', 'grad_norm': '2.156', 'learning_rate': '0.000168', 'epoch': '2.657'}
+{'loss': '0.1451', 'grad_norm': '1.836', 'learning_rate': '0.0001648', 'epoch': '2.682'}
+{'loss': '0.159', 'grad_norm': '0.2832', 'learning_rate': '0.0001616', 'epoch': '2.708'}
+{'loss': '0.1295', 'grad_norm': '1.344', 'learning_rate': '0.0001584', 'epoch': '2.733'}
+{'loss': '0.1481', 'grad_norm': '1.094', 'learning_rate': '0.0001552', 'epoch': '2.759'}
+{'loss': '0.1477', 'grad_norm': '0.8711', 'learning_rate': '0.000152', 'epoch': '2.784'}
+{'loss': '0.1662', 'grad_norm': '0.7383', 'learning_rate': '0.0001488', 'epoch': '2.81'}
+{'loss': '0.1438', 'grad_norm': '1.352', 'learning_rate': '0.0001456', 'epoch': '2.835'}
+{'loss': '0.1602', 'grad_norm': '2.047', 'learning_rate': '0.0001424', 'epoch': '2.861'}
+{'loss': '0.1488', 'grad_norm': '0.457', 'learning_rate': '0.0001392', 'epoch': '2.886'}
+{'loss': '0.1517', 'grad_norm': '2.266', 'learning_rate': '0.000136', 'epoch': '2.912'}
+{'loss': '0.1377', 'grad_norm': '1.656', 'learning_rate': '0.0001329', 'epoch': '2.938'}
+{'loss': '0.1375', 'grad_norm': '0.5117', 'learning_rate': '0.0001297', 'epoch': '2.963'}
+{'loss': '0.1479', 'grad_norm': '0.4062', 'learning_rate': '0.0001265', 'epoch': '2.989'}
+{'eval_loss': '0.07126', 'eval_runtime': '22.27', 'eval_samples_per_second': '1205', 'eval_steps_per_second': '37.67', 'epoch': '3'}
+Writing model shards: 100%|██████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  1.36it/s]
+{'loss': '0.1147', 'grad_norm': '1.414', 'learning_rate': '0.0001233', 'epoch': '3.014'}
+{'loss': '0.1339', 'grad_norm': '0.8086', 'learning_rate': '0.0001201', 'epoch': '3.04'}
+{'loss': '0.1449', 'grad_norm': '2.75', 'learning_rate': '0.0001169', 'epoch': '3.065'}
+{'loss': '0.1349', 'grad_norm': '2.391', 'learning_rate': '0.0001137', 'epoch': '3.091'}
+{'loss': '0.1418', 'grad_norm': '0.875', 'learning_rate': '0.0001105', 'epoch': '3.116'}
+{'loss': '0.1316', 'grad_norm': '3.469', 'learning_rate': '0.0001073', 'epoch': '3.142'}
+{'loss': '0.1602', 'grad_norm': '0.4473', 'learning_rate': '0.0001041', 'epoch': '3.167'}
+{'loss': '0.147', 'grad_norm': '1.875', 'learning_rate': '0.0001009', 'epoch': '3.193'}
+{'loss': '0.1638', 'grad_norm': '0.6328', 'learning_rate': '9.773e-05', 'epoch': '3.218'}
+{'loss': '0.1375', 'grad_norm': '0.1797', 'learning_rate': '9.454e-05', 'epoch': '3.244'}
+{'loss': '0.151', 'grad_norm': '0.1416', 'learning_rate': '9.135e-05', 'epoch': '3.27'}
+{'loss': '0.1458', 'grad_norm': '2.781', 'learning_rate': '8.815e-05', 'epoch': '3.295'}
+{'loss': '0.1506', 'grad_norm': '0.4395', 'learning_rate': '8.496e-05', 'epoch': '3.321'}
+{'loss': '0.1422', 'grad_norm': '0.832', 'learning_rate': '8.177e-05', 'epoch': '3.346'}
+{'loss': '0.1566', 'grad_norm': '0.7773', 'learning_rate': '7.858e-05', 'epoch': '3.372'}
+{'loss': '0.1364', 'grad_norm': '0.2891', 'learning_rate': '7.538e-05', 'epoch': '3.397'}
+{'loss': '0.1363', 'grad_norm': '0.7422', 'learning_rate': '7.219e-05', 'epoch': '3.423'}
+{'loss': '0.1612', 'grad_norm': '0.7734', 'learning_rate': '6.9e-05', 'epoch': '3.448'}
+{'loss': '0.1332', 'grad_norm': '1.781', 'learning_rate': '6.58e-05', 'epoch': '3.474'}
+{'loss': '0.1409', 'grad_norm': '0.5391', 'learning_rate': '6.261e-05', 'epoch': '3.499'}
+{'loss': '0.168', 'grad_norm': '0.5156', 'learning_rate': '5.942e-05', 'epoch': '3.525'}
+{'loss': '0.1341', 'grad_norm': '0.9062', 'learning_rate': '5.623e-05', 'epoch': '3.551'}
+{'loss': '0.1316', 'grad_norm': '1.141', 'learning_rate': '5.303e-05', 'epoch': '3.576'}
+{'loss': '0.1552', 'grad_norm': '0.543', 'learning_rate': '4.984e-05', 'epoch': '3.602'}
+{'loss': '0.1453', 'grad_norm': '0.6523', 'learning_rate': '4.665e-05', 'epoch': '3.627'}
+{'loss': '0.1207', 'grad_norm': '1.297', 'learning_rate': '4.345e-05', 'epoch': '3.653'}
+{'loss': '0.1294', 'grad_norm': '0.8633', 'learning_rate': '4.026e-05', 'epoch': '3.678'}
+{'loss': '0.1494', 'grad_norm': '0.9922', 'learning_rate': '3.707e-05', 'epoch': '3.704'}
+{'loss': '0.1543', 'grad_norm': '0.2393', 'learning_rate': '3.388e-05', 'epoch': '3.729'}
+{'loss': '0.1429', 'grad_norm': '1.344', 'learning_rate': '3.068e-05', 'epoch': '3.755'}
+{'loss': '0.1294', 'grad_norm': '1.164', 'learning_rate': '2.749e-05', 'epoch': '3.78'}
+{'loss': '0.1552', 'grad_norm': '0.6602', 'learning_rate': '2.43e-05', 'epoch': '3.806'}
+{'loss': '0.1587', 'grad_norm': '0.8477', 'learning_rate': '2.11e-05', 'epoch': '3.832'}
+{'loss': '0.1375', 'grad_norm': '1.586', 'learning_rate': '1.791e-05', 'epoch': '3.857'}
+{'loss': '0.1443', 'grad_norm': '0.6094', 'learning_rate': '1.472e-05', 'epoch': '3.883'}
+{'loss': '0.1366', 'grad_norm': '0.2295', 'learning_rate': '1.153e-05', 'epoch': '3.908'}
+{'loss': '0.1599', 'grad_norm': '0.6055', 'learning_rate': '8.333e-06', 'epoch': '3.934'}
+{'loss': '0.1358', 'grad_norm': '0.6016', 'learning_rate': '5.14e-06', 'epoch': '3.959'}
+{'loss': '0.1243', 'grad_norm': '0.6445', 'learning_rate': '1.948e-06', 'epoch': '3.985'}
+{'eval_loss': '0.07108', 'eval_runtime': '22.07', 'eval_samples_per_second': '1216', 'eval_steps_per_second': '38.01', 'epoch': '4'}
+Writing model shards: 100%|██████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  1.37it/s]
+{'train_runtime': '4463', 'train_samples_per_second': '112.3', 'train_steps_per_second': '3.509', 'train_loss': '0.2062', 'epoch': '4'}
+100%|██████████████████████████████████████████████████████████████████████████| 15660/15660 [1:14:23<00:00,  3.51it/s]
+
+[A_final] Overall ERR: 28.87  (TP=982, FP=302, FN=1373)
+  de  : ERR= 24.51  (TP=282, FP=68, FN=591)
+  en  : ERR= 55.29  (TP=421, FP=71, FN=212)
+  ja  : ERR= 13.76  (TP=243, FP=149, FN=440)
+  ko  : ERR= 13.25  (TP=36, FP=14, FN=130)
+
+Evaluating ./exp_A\checkpoint-3915...
+Loading weights: 100%|████████████████████████████████████████████████████████████| 252/252 [00:00<00:00, 14667.03it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+
+[A/checkpoint-3915] Overall ERR: 22.04  (TP=776, FP=257, FN=1579)
+  de  : ERR= 16.27  (TP=181, FP=39, FN=692)
+  en  : ERR= 46.13  (TP=360, FP=68, FN=273)
+  ja  : ERR= 12.74  (TP=210, FP=123, FN=473)
+  ko  : ERR= -1.20  (TP=25, FP=27, FN=141)
+
+Evaluating ./exp_A\checkpoint-7830...
+Loading weights: 100%|████████████████████████████████████████████████████████████| 252/252 [00:00<00:00, 14370.89it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+
+[A/checkpoint-7830] Overall ERR: 26.33  (TP=901, FP=281, FN=1454)
+  de  : ERR= 22.79  (TP=251, FP=52, FN=622)
+  en  : ERR= 54.34  (TP=415, FP=71, FN=218)
+  ja  : ERR=  9.96  (TP=211, FP=143, FN=472)
+  ko  : ERR=  5.42  (TP=24, FP=15, FN=142)
+
+Evaluating ./exp_A\checkpoint-11745...
+Loading weights: 100%|████████████████████████████████████████████████████████████| 252/252 [00:00<00:00, 14432.11it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+
+[A/checkpoint-11745] Overall ERR: 30.06  (TP=933, FP=225, FN=1422)
+  de  : ERR= 24.51  (TP=272, FP=58, FN=601)
+  en  : ERR= 55.45  (TP=421, FP=70, FN=212)
+  ja  : ERR= 18.16  (TP=208, FP=84, FN=475)
+  ko  : ERR= 11.45  (TP=32, FP=13, FN=134)
+
+Evaluating ./exp_A\checkpoint-15660...
+Loading weights: 100%|████████████████████████████████████████████████████████████| 252/252 [00:00<00:00, 14663.57it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+
+[A/checkpoint-15660] Overall ERR: 28.83  (TP=979, FP=300, FN=1376)
+  de  : ERR= 24.28  (TP=280, FP=68, FN=593)
+  en  : ERR= 55.45  (TP=421, FP=70, FN=212)
+  ja  : ERR= 13.76  (TP=243, FP=149, FN=440)
+  ko  : ERR= 13.25  (TP=35, FP=13, FN=131)
+
+==================================================
+EXPERIMENT B: wiki pre-train → fine-tune (논문 방식)
+==================================================
+
+[B-1] Pre-training on wiki_aug...
+  wiki_aug (ko, en, ja, de): 20000
+Map: 100%|██████████████████████████████████████████████████████████████| 20000/20000 [00:10<00:00, 1991.97 examples/s]
+Pre-training (20000 samples, 3 epochs, lr=5e-4)...
+Loading weights: 100%|█████████████████████████████████████████████████████████████| 254/254 [00:00<00:00, 1562.48it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+[transformers] `logging_dir` is deprecated and will be removed in v5.2. Please set `TENSORBOARD_LOGGING_DIR` instead.
+{'loss': '2.944', 'grad_norm': '3.422', 'learning_rate': '0.0004736', 'epoch': '0.16'}
+{'loss': '0.7887', 'grad_norm': '2.734', 'learning_rate': '0.0004469', 'epoch': '0.32'}
+{'loss': '0.5947', 'grad_norm': '2.609', 'learning_rate': '0.0004203', 'epoch': '0.48'}
+{'loss': '0.5157', 'grad_norm': '1.906', 'learning_rate': '0.0003936', 'epoch': '0.64'}
+{'loss': '0.4868', 'grad_norm': '2.391', 'learning_rate': '0.0003669', 'epoch': '0.8'}
+{'loss': '0.4369', 'grad_norm': '3.062', 'learning_rate': '0.0003403', 'epoch': '0.96'}
+{'eval_loss': '0.491', 'eval_runtime': '20.89', 'eval_samples_per_second': '1285', 'eval_steps_per_second': '40.17', 'epoch': '1'}
+Writing model shards: 100%|██████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  1.34it/s]
+{'loss': '0.3657', 'grad_norm': '2.672', 'learning_rate': '0.0003136', 'epoch': '1.12'}
+{'loss': '0.3359', 'grad_norm': '1.984', 'learning_rate': '0.0002869', 'epoch': '1.28'}
+{'loss': '0.3113', 'grad_norm': '1.586', 'learning_rate': '0.0002603', 'epoch': '1.44'}
+{'loss': '0.3093', 'grad_norm': '1.703', 'learning_rate': '0.0002336', 'epoch': '1.6'}
+{'loss': '0.2819', 'grad_norm': '2.422', 'learning_rate': '0.0002069', 'epoch': '1.76'}
+{'loss': '0.2747', 'grad_norm': '2.422', 'learning_rate': '0.0001803', 'epoch': '1.92'}
+{'eval_loss': '0.5519', 'eval_runtime': '20.85', 'eval_samples_per_second': '1287', 'eval_steps_per_second': '40.24', 'epoch': '2'}
+Writing model shards: 100%|██████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  1.33it/s]
+{'loss': '0.2528', 'grad_norm': '1.938', 'learning_rate': '0.0001536', 'epoch': '2.08'}
+{'loss': '0.2158', 'grad_norm': '1.758', 'learning_rate': '0.0001269', 'epoch': '2.24'}
+{'loss': '0.2247', 'grad_norm': '2.453', 'learning_rate': '0.0001003', 'epoch': '2.4'}
+{'loss': '0.2331', 'grad_norm': '1.898', 'learning_rate': '7.36e-05', 'epoch': '2.56'}
+{'loss': '0.2173', 'grad_norm': '2.656', 'learning_rate': '4.693e-05', 'epoch': '2.72'}
+{'loss': '0.2082', 'grad_norm': '2.625', 'learning_rate': '2.027e-05', 'epoch': '2.88'}
+{'eval_loss': '0.5945', 'eval_runtime': '20.72', 'eval_samples_per_second': '1295', 'eval_steps_per_second': '40.49', 'epoch': '3'}
+Writing model shards: 100%|██████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  1.23it/s]
+{'train_runtime': '536.5', 'train_samples_per_second': '111.8', 'train_steps_per_second': '3.495', 'train_loss': '0.4886', 'epoch': '3'}
+100%|██████████████████████████████████████████████████████████████████████████████| 1875/1875 [08:56<00:00,  3.49it/s]
+Writing model shards: 100%|██████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  1.24it/s]
+Pre-trained model saved to ./exp_B_pretrain\pretrained_model
+
+[B-2] Fine-tuning on original data...
+  train (ko, en, ja, de): 125255
+Map: 100%|████████████████████████████████████████████████████████████| 125255/125255 [00:50<00:00, 2458.91 examples/s]
+Fine-tuning (125255 samples, 4 epochs, lr=1e-4)...
+Loading weights: 100%|████████████████████████████████████████████████████████████| 252/252 [00:00<00:00, 13497.70it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+[transformers] `logging_dir` is deprecated and will be removed in v5.2. Please set `TENSORBOARD_LOGGING_DIR` instead.
+{'loss': '0.7601', 'grad_norm': '4.5', 'learning_rate': '9.937e-05', 'epoch': '0.02555'}
+{'loss': '0.5217', 'grad_norm': '1.898', 'learning_rate': '9.873e-05', 'epoch': '0.05109'}
+{'loss': '0.4967', 'grad_norm': '4.188', 'learning_rate': '9.809e-05', 'epoch': '0.07664'}
+{'loss': '0.4906', 'grad_norm': '1.875', 'learning_rate': '9.745e-05', 'epoch': '0.1022'}
+{'loss': '0.4474', 'grad_norm': '0.7266', 'learning_rate': '9.681e-05', 'epoch': '0.1277'}
+{'loss': '0.4144', 'grad_norm': '1.945', 'learning_rate': '9.617e-05', 'epoch': '0.1533'}
+{'loss': '0.4042', 'grad_norm': '3.391', 'learning_rate': '9.554e-05', 'epoch': '0.1788'}
+{'loss': '0.4073', 'grad_norm': '3.812', 'learning_rate': '9.49e-05', 'epoch': '0.2044'}
+{'loss': '0.3698', 'grad_norm': '1.812', 'learning_rate': '9.426e-05', 'epoch': '0.2299'}
+{'loss': '0.3912', 'grad_norm': '1.406', 'learning_rate': '9.362e-05', 'epoch': '0.2555'}
+{'loss': '0.4414', 'grad_norm': '2.266', 'learning_rate': '9.298e-05', 'epoch': '0.281'}
+{'loss': '0.3415', 'grad_norm': '1.891', 'learning_rate': '9.234e-05', 'epoch': '0.3066'}
+{'loss': '0.3586', 'grad_norm': '0.8633', 'learning_rate': '9.17e-05', 'epoch': '0.3321'}
+{'loss': '0.3843', 'grad_norm': '1.203', 'learning_rate': '9.107e-05', 'epoch': '0.3576'}
+{'loss': '0.33', 'grad_norm': '2.344', 'learning_rate': '9.043e-05', 'epoch': '0.3832'}
+{'loss': '0.3386', 'grad_norm': '2.469', 'learning_rate': '8.979e-05', 'epoch': '0.4087'}
+{'loss': '0.3048', 'grad_norm': '2.719', 'learning_rate': '8.915e-05', 'epoch': '0.4343'}
+{'loss': '0.3758', 'grad_norm': '1.438', 'learning_rate': '8.851e-05', 'epoch': '0.4598'}
+{'loss': '0.3468', 'grad_norm': '1.391', 'learning_rate': '8.787e-05', 'epoch': '0.4854'}
+{'loss': '0.3491', 'grad_norm': '2.656', 'learning_rate': '8.723e-05', 'epoch': '0.5109'}
+{'loss': '0.3715', 'grad_norm': '1.117', 'learning_rate': '8.66e-05', 'epoch': '0.5365'}
+{'loss': '0.3606', 'grad_norm': '0.7578', 'learning_rate': '8.596e-05', 'epoch': '0.562'}
+{'loss': '0.3656', 'grad_norm': '1.289', 'learning_rate': '8.532e-05', 'epoch': '0.5876'}
+{'loss': '0.3293', 'grad_norm': '0.8711', 'learning_rate': '8.468e-05', 'epoch': '0.6131'}
+{'loss': '0.3243', 'grad_norm': '3.266', 'learning_rate': '8.404e-05', 'epoch': '0.6387'}
+{'loss': '0.3114', 'grad_norm': '2.047', 'learning_rate': '8.34e-05', 'epoch': '0.6642'}
+{'loss': '0.3017', 'grad_norm': '1.633', 'learning_rate': '8.277e-05', 'epoch': '0.6897'}
+{'loss': '0.2948', 'grad_norm': '2.422', 'learning_rate': '8.213e-05', 'epoch': '0.7153'}
+{'loss': '0.315', 'grad_norm': '2.094', 'learning_rate': '8.149e-05', 'epoch': '0.7408'}
+{'loss': '0.3444', 'grad_norm': '2.359', 'learning_rate': '8.085e-05', 'epoch': '0.7664'}
+{'loss': '0.3221', 'grad_norm': '1.68', 'learning_rate': '8.021e-05', 'epoch': '0.7919'}
+{'loss': '0.3343', 'grad_norm': '1.219', 'learning_rate': '7.957e-05', 'epoch': '0.8175'}
+{'loss': '0.3017', 'grad_norm': '1.68', 'learning_rate': '7.893e-05', 'epoch': '0.843'}
+{'loss': '0.2936', 'grad_norm': '1.062', 'learning_rate': '7.83e-05', 'epoch': '0.8686'}
+{'loss': '0.2735', 'grad_norm': '3.422', 'learning_rate': '7.766e-05', 'epoch': '0.8941'}
+{'loss': '0.3186', 'grad_norm': '1.242', 'learning_rate': '7.702e-05', 'epoch': '0.9197'}
+{'loss': '0.2903', 'grad_norm': '1.922', 'learning_rate': '7.638e-05', 'epoch': '0.9452'}
+{'loss': '0.3225', 'grad_norm': '1.516', 'learning_rate': '7.574e-05', 'epoch': '0.9707'}
+{'loss': '0.3642', 'grad_norm': '2.5', 'learning_rate': '7.51e-05', 'epoch': '0.9963'}
+{'eval_loss': '0.1082', 'eval_runtime': '20.78', 'eval_samples_per_second': '1291', 'eval_steps_per_second': '40.37', 'epoch': '1'}
+Writing model shards: 100%|██████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  1.48it/s]
+{'loss': '0.3441', 'grad_norm': '4.875', 'learning_rate': '7.446e-05', 'epoch': '1.022'}
+{'loss': '0.3047', 'grad_norm': '0.9102', 'learning_rate': '7.383e-05', 'epoch': '1.047'}
+{'loss': '0.2887', 'grad_norm': '2.141', 'learning_rate': '7.319e-05', 'epoch': '1.073'}
+{'loss': '0.3492', 'grad_norm': '3.641', 'learning_rate': '7.255e-05', 'epoch': '1.098'}
+{'loss': '0.2832', 'grad_norm': '1.539', 'learning_rate': '7.191e-05', 'epoch': '1.124'}
+{'loss': '0.3028', 'grad_norm': '2.344', 'learning_rate': '7.127e-05', 'epoch': '1.149'}
+{'loss': '0.2512', 'grad_norm': '2.469', 'learning_rate': '7.063e-05', 'epoch': '1.175'}
+{'loss': '0.3281', 'grad_norm': '1.219', 'learning_rate': '6.999e-05', 'epoch': '1.201'}
+{'loss': '0.282', 'grad_norm': '2.562', 'learning_rate': '6.936e-05', 'epoch': '1.226'}
+{'loss': '0.2839', 'grad_norm': '4.312', 'learning_rate': '6.872e-05', 'epoch': '1.252'}
+{'loss': '0.2662', 'grad_norm': '3.344', 'learning_rate': '6.808e-05', 'epoch': '1.277'}
+{'loss': '0.2965', 'grad_norm': '2.875', 'learning_rate': '6.744e-05', 'epoch': '1.303'}
+{'loss': '0.3075', 'grad_norm': '2.688', 'learning_rate': '6.68e-05', 'epoch': '1.328'}
+{'loss': '0.3028', 'grad_norm': '3.703', 'learning_rate': '6.616e-05', 'epoch': '1.354'}
+{'loss': '0.3112', 'grad_norm': '2.469', 'learning_rate': '6.552e-05', 'epoch': '1.379'}
+{'loss': '0.2831', 'grad_norm': '0.9102', 'learning_rate': '6.489e-05', 'epoch': '1.405'}
+{'loss': '0.2916', 'grad_norm': '0.9727', 'learning_rate': '6.425e-05', 'epoch': '1.43'}
+{'loss': '0.2976', 'grad_norm': '1.5', 'learning_rate': '6.361e-05', 'epoch': '1.456'}
+{'loss': '0.2562', 'grad_norm': '1.078', 'learning_rate': '6.297e-05', 'epoch': '1.482'}
+{'loss': '0.2946', 'grad_norm': '2.188', 'learning_rate': '6.233e-05', 'epoch': '1.507'}
+{'loss': '0.2976', 'grad_norm': '0.5312', 'learning_rate': '6.169e-05', 'epoch': '1.533'}
+{'loss': '0.296', 'grad_norm': '2.625', 'learning_rate': '6.105e-05', 'epoch': '1.558'}
+{'loss': '0.2799', 'grad_norm': '4.438', 'learning_rate': '6.042e-05', 'epoch': '1.584'}
+{'loss': '0.2913', 'grad_norm': '1.094', 'learning_rate': '5.978e-05', 'epoch': '1.609'}
+{'loss': '0.282', 'grad_norm': '0.9688', 'learning_rate': '5.914e-05', 'epoch': '1.635'}
+{'loss': '0.2665', 'grad_norm': '1.734', 'learning_rate': '5.85e-05', 'epoch': '1.66'}
+{'loss': '0.2711', 'grad_norm': '1.828', 'learning_rate': '5.786e-05', 'epoch': '1.686'}
+{'loss': '0.3012', 'grad_norm': '3.672', 'learning_rate': '5.722e-05', 'epoch': '1.711'}
+{'loss': '0.3142', 'grad_norm': '0.7734', 'learning_rate': '5.658e-05', 'epoch': '1.737'}
+{'loss': '0.3093', 'grad_norm': '1.438', 'learning_rate': '5.595e-05', 'epoch': '1.763'}
+{'loss': '0.2746', 'grad_norm': '0.5469', 'learning_rate': '5.531e-05', 'epoch': '1.788'}
+{'loss': '0.2648', 'grad_norm': '2.641', 'learning_rate': '5.467e-05', 'epoch': '1.814'}
+{'loss': '0.2865', 'grad_norm': '2.234', 'learning_rate': '5.403e-05', 'epoch': '1.839'}
+{'loss': '0.321', 'grad_norm': '2.594', 'learning_rate': '5.339e-05', 'epoch': '1.865'}
+{'loss': '0.2656', 'grad_norm': '1.273', 'learning_rate': '5.275e-05', 'epoch': '1.89'}
+{'loss': '0.3003', 'grad_norm': '0.4824', 'learning_rate': '5.211e-05', 'epoch': '1.916'}
+{'loss': '0.2428', 'grad_norm': '1.164', 'learning_rate': '5.148e-05', 'epoch': '1.941'}
+{'loss': '0.3154', 'grad_norm': '3.516', 'learning_rate': '5.084e-05', 'epoch': '1.967'}
+{'loss': '0.2727', 'grad_norm': '1.578', 'learning_rate': '5.02e-05', 'epoch': '1.992'}
+{'eval_loss': '0.1031', 'eval_runtime': '20.91', 'eval_samples_per_second': '1283', 'eval_steps_per_second': '40.12', 'epoch': '2'}
+Writing model shards: 100%|██████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  1.37it/s]
+{'loss': '0.2833', 'grad_norm': '1.523', 'learning_rate': '4.956e-05', 'epoch': '2.018'}
+{'loss': '0.2502', 'grad_norm': '2.828', 'learning_rate': '4.892e-05', 'epoch': '2.043'}
+{'loss': '0.2594', 'grad_norm': '1.281', 'learning_rate': '4.828e-05', 'epoch': '2.069'}
+{'loss': '0.2801', 'grad_norm': '0.918', 'learning_rate': '4.764e-05', 'epoch': '2.095'}
+{'loss': '0.3108', 'grad_norm': '1.031', 'learning_rate': '4.701e-05', 'epoch': '2.12'}
+{'loss': '0.2514', 'grad_norm': '2.094', 'learning_rate': '4.637e-05', 'epoch': '2.146'}
+{'loss': '0.2668', 'grad_norm': '2.109', 'learning_rate': '4.573e-05', 'epoch': '2.171'}
+{'loss': '0.3037', 'grad_norm': '0.8398', 'learning_rate': '4.509e-05', 'epoch': '2.197'}
+{'loss': '0.278', 'grad_norm': '3.031', 'learning_rate': '4.445e-05', 'epoch': '2.222'}
+{'loss': '0.2494', 'grad_norm': '0.4902', 'learning_rate': '4.381e-05', 'epoch': '2.248'}
+{'loss': '0.294', 'grad_norm': '1.57', 'learning_rate': '4.317e-05', 'epoch': '2.273'}
+{'loss': '0.2877', 'grad_norm': '1.023', 'learning_rate': '4.254e-05', 'epoch': '2.299'}
+{'loss': '0.326', 'grad_norm': '3.359', 'learning_rate': '4.19e-05', 'epoch': '2.324'}
+{'loss': '0.2523', 'grad_norm': '2.016', 'learning_rate': '4.126e-05', 'epoch': '2.35'}
+{'loss': '0.3098', 'grad_norm': '0.8594', 'learning_rate': '4.062e-05', 'epoch': '2.376'}
+{'loss': '0.3028', 'grad_norm': '3.484', 'learning_rate': '3.998e-05', 'epoch': '2.401'}
+{'loss': '0.3041', 'grad_norm': '1.43', 'learning_rate': '3.934e-05', 'epoch': '2.427'}
+{'loss': '0.2831', 'grad_norm': '2.719', 'learning_rate': '3.87e-05', 'epoch': '2.452'}
+{'loss': '0.3175', 'grad_norm': '1.281', 'learning_rate': '3.807e-05', 'epoch': '2.478'}
+{'loss': '0.2708', 'grad_norm': '1.18', 'learning_rate': '3.743e-05', 'epoch': '2.503'}
+{'loss': '0.2689', 'grad_norm': '1.266', 'learning_rate': '3.679e-05', 'epoch': '2.529'}
+{'loss': '0.2946', 'grad_norm': '0.9531', 'learning_rate': '3.615e-05', 'epoch': '2.554'}
+{'loss': '0.2682', 'grad_norm': '2.234', 'learning_rate': '3.551e-05', 'epoch': '2.58'}
+{'loss': '0.2404', 'grad_norm': '1.547', 'learning_rate': '3.487e-05', 'epoch': '2.605'}
+{'loss': '0.2711', 'grad_norm': '2.562', 'learning_rate': '3.423e-05', 'epoch': '2.631'}
+{'loss': '0.2995', 'grad_norm': '3.906', 'learning_rate': '3.36e-05', 'epoch': '2.657'}
+{'loss': '0.2806', 'grad_norm': '3.047', 'learning_rate': '3.296e-05', 'epoch': '2.682'}
+{'loss': '0.2971', 'grad_norm': '0.5508', 'learning_rate': '3.232e-05', 'epoch': '2.708'}
+{'loss': '0.2476', 'grad_norm': '1.727', 'learning_rate': '3.168e-05', 'epoch': '2.733'}
+{'loss': '0.2931', 'grad_norm': '3.016', 'learning_rate': '3.104e-05', 'epoch': '2.759'}
+{'loss': '0.2768', 'grad_norm': '1.727', 'learning_rate': '3.04e-05', 'epoch': '2.784'}
+{'loss': '0.3135', 'grad_norm': '0.8555', 'learning_rate': '2.976e-05', 'epoch': '2.81'}
+{'loss': '0.2628', 'grad_norm': '2.031', 'learning_rate': '2.913e-05', 'epoch': '2.835'}
+{'loss': '0.289', 'grad_norm': '7.219', 'learning_rate': '2.849e-05', 'epoch': '2.861'}
+{'loss': '0.281', 'grad_norm': '0.8945', 'learning_rate': '2.785e-05', 'epoch': '2.886'}
+{'loss': '0.3049', 'grad_norm': '2.562', 'learning_rate': '2.721e-05', 'epoch': '2.912'}
+{'loss': '0.2624', 'grad_norm': '4.219', 'learning_rate': '2.657e-05', 'epoch': '2.938'}
+{'loss': '0.262', 'grad_norm': '0.6445', 'learning_rate': '2.593e-05', 'epoch': '2.963'}
+{'loss': '0.2887', 'grad_norm': '0.8242', 'learning_rate': '2.529e-05', 'epoch': '2.989'}
+{'eval_loss': '0.1021', 'eval_runtime': '23.13', 'eval_samples_per_second': '1160', 'eval_steps_per_second': '36.28', 'epoch': '3'}
+Writing model shards: 100%|██████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  1.36it/s]
+{'loss': '0.225', 'grad_norm': '1.719', 'learning_rate': '2.466e-05', 'epoch': '3.014'}
+{'loss': '0.2557', 'grad_norm': '0.832', 'learning_rate': '2.402e-05', 'epoch': '3.04'}
+{'loss': '0.2955', 'grad_norm': '1.164', 'learning_rate': '2.338e-05', 'epoch': '3.065'}
+{'loss': '0.2649', 'grad_norm': '2.219', 'learning_rate': '2.274e-05', 'epoch': '3.091'}
+{'loss': '0.2703', 'grad_norm': '1.211', 'learning_rate': '2.21e-05', 'epoch': '3.116'}
+{'loss': '0.2579', 'grad_norm': '3.453', 'learning_rate': '2.146e-05', 'epoch': '3.142'}
+{'loss': '0.3115', 'grad_norm': '2.469', 'learning_rate': '2.082e-05', 'epoch': '3.167'}
+{'loss': '0.2845', 'grad_norm': '2.203', 'learning_rate': '2.019e-05', 'epoch': '3.193'}
+{'loss': '0.3012', 'grad_norm': '3.25', 'learning_rate': '1.955e-05', 'epoch': '3.218'}
+{'loss': '0.2813', 'grad_norm': '1.086', 'learning_rate': '1.891e-05', 'epoch': '3.244'}
+{'loss': '0.2945', 'grad_norm': '0.7969', 'learning_rate': '1.827e-05', 'epoch': '3.27'}
+{'loss': '0.2764', 'grad_norm': '2.484', 'learning_rate': '1.763e-05', 'epoch': '3.295'}
+{'loss': '0.2809', 'grad_norm': '1.234', 'learning_rate': '1.699e-05', 'epoch': '3.321'}
+{'loss': '0.292', 'grad_norm': '1.266', 'learning_rate': '1.635e-05', 'epoch': '3.346'}
+{'loss': '0.2827', 'grad_norm': '0.9766', 'learning_rate': '1.572e-05', 'epoch': '3.372'}
+{'loss': '0.2644', 'grad_norm': '0.6016', 'learning_rate': '1.508e-05', 'epoch': '3.397'}
+{'loss': '0.2818', 'grad_norm': '1.148', 'learning_rate': '1.444e-05', 'epoch': '3.423'}
+{'loss': '0.311', 'grad_norm': '1.258', 'learning_rate': '1.38e-05', 'epoch': '3.448'}
+{'loss': '0.2655', 'grad_norm': '3.219', 'learning_rate': '1.316e-05', 'epoch': '3.474'}
+{'loss': '0.2604', 'grad_norm': '4.969', 'learning_rate': '1.252e-05', 'epoch': '3.499'}
+{'loss': '0.3153', 'grad_norm': '1.258', 'learning_rate': '1.188e-05', 'epoch': '3.525'}
+{'loss': '0.2704', 'grad_norm': '2.234', 'learning_rate': '1.125e-05', 'epoch': '3.551'}
+{'loss': '0.2758', 'grad_norm': '2.031', 'learning_rate': '1.061e-05', 'epoch': '3.576'}
+{'loss': '0.2907', 'grad_norm': '1.5', 'learning_rate': '9.968e-06', 'epoch': '3.602'}
+{'loss': '0.2832', 'grad_norm': '1.672', 'learning_rate': '9.33e-06', 'epoch': '3.627'}
+{'loss': '0.2479', 'grad_norm': '1.719', 'learning_rate': '8.691e-06', 'epoch': '3.653'}
+{'loss': '0.2579', 'grad_norm': '1.484', 'learning_rate': '8.052e-06', 'epoch': '3.678'}
+{'loss': '0.2958', 'grad_norm': '1.672', 'learning_rate': '7.414e-06', 'epoch': '3.704'}
+{'loss': '0.3034', 'grad_norm': '0.4414', 'learning_rate': '6.775e-06', 'epoch': '3.729'}
+{'loss': '0.2944', 'grad_norm': '1.82', 'learning_rate': '6.137e-06', 'epoch': '3.755'}
+{'loss': '0.2569', 'grad_norm': '2.391', 'learning_rate': '5.498e-06', 'epoch': '3.78'}
+{'loss': '0.3121', 'grad_norm': '0.832', 'learning_rate': '4.86e-06', 'epoch': '3.806'}
+{'loss': '0.2977', 'grad_norm': '0.5391', 'learning_rate': '4.221e-06', 'epoch': '3.832'}
+{'loss': '0.2622', 'grad_norm': '2.391', 'learning_rate': '3.582e-06', 'epoch': '3.857'}
+{'loss': '0.2955', 'grad_norm': '1.148', 'learning_rate': '2.944e-06', 'epoch': '3.883'}
+{'loss': '0.2607', 'grad_norm': '1.203', 'learning_rate': '2.305e-06', 'epoch': '3.908'}
+{'loss': '0.3004', 'grad_norm': '1.133', 'learning_rate': '1.667e-06', 'epoch': '3.934'}
+{'loss': '0.2728', 'grad_norm': '0.8867', 'learning_rate': '1.028e-06', 'epoch': '3.959'}
+{'loss': '0.261', 'grad_norm': '0.9336', 'learning_rate': '3.895e-07', 'epoch': '3.985'}
+{'eval_loss': '0.1021', 'eval_runtime': '20.83', 'eval_samples_per_second': '1288', 'eval_steps_per_second': '40.28', 'epoch': '4'}
+Writing model shards: 100%|██████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  1.40it/s]
+{'train_runtime': '4126', 'train_samples_per_second': '121.4', 'train_steps_per_second': '3.796', 'train_loss': '0.3055', 'epoch': '4'}
+100%|██████████████████████████████████████████████████████████████████████████| 15660/15660 [1:08:45<00:00,  3.80it/s]
+
+[B_final] Overall ERR: 18.00  (TP=655, FP=231, FN=1700)
+  de  : ERR= 13.52  (TP=151, FP=33, FN=722)
+  en  : ERR= 38.07  (TP=309, FP=68, FN=324)
+  ja  : ERR= 10.83  (TP=192, FP=118, FN=491)
+  ko  : ERR= -5.42  (TP=3, FP=12, FN=163)
+
+Evaluating ./exp_B_finetune\checkpoint-3915...
+Loading weights: 100%|████████████████████████████████████████████████████████████| 252/252 [00:00<00:00, 14623.40it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+
+[B/checkpoint-3915] Overall ERR: 14.90  (TP=588, FP=237, FN=1767)
+  de  : ERR=  9.85  (TP=118, FP=32, FN=755)
+  en  : ERR= 33.02  (TP=279, FP=70, FN=354)
+  ja  : ERR=  9.96  (TP=191, FP=123, FN=492)
+  ko  : ERR= -7.23  (TP=0, FP=12, FN=166)
+
+Evaluating ./exp_B_finetune\checkpoint-7830...
+Loading weights: 100%|████████████████████████████████████████████████████████████| 252/252 [00:00<00:00, 14222.76it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+
+[B/checkpoint-7830] Overall ERR: 17.71  (TP=649, FP=232, FN=1706)
+  de  : ERR= 12.37  (TP=144, FP=36, FN=729)
+  en  : ERR= 38.07  (TP=310, FP=69, FN=323)
+  ja  : ERR= 10.83  (TP=192, FP=118, FN=491)
+  ko  : ERR= -3.61  (TP=3, FP=9, FN=163)
+
+Evaluating ./exp_B_finetune\checkpoint-11745...
+Loading weights: 100%|████████████████████████████████████████████████████████████| 252/252 [00:00<00:00, 13040.41it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+
+[B/checkpoint-11745] Overall ERR: 18.05  (TP=655, FP=230, FN=1700)
+  de  : ERR= 13.75  (TP=151, FP=31, FN=722)
+  en  : ERR= 37.91  (TP=309, FP=69, FN=324)
+  ja  : ERR= 10.83  (TP=192, FP=118, FN=491)
+  ko  : ERR= -5.42  (TP=3, FP=12, FN=163)
+
+Evaluating ./exp_B_finetune\checkpoint-15660...
+Loading weights: 100%|████████████████████████████████████████████████████████████| 252/252 [00:00<00:00, 12947.60it/s]
+[transformers] The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning.
+
+[B/checkpoint-15660] Overall ERR: 18.05  (TP=655, FP=230, FN=1700)
+  de  : ERR= 13.63  (TP=151, FP=32, FN=722)
+  en  : ERR= 38.07  (TP=309, FP=68, FN=324)
+  ja  : ERR= 10.83  (TP=192, FP=118, FN=491)
+  ko  : ERR= -5.42  (TP=3, FP=12, FN=163)
+
+==================================================
+FINAL COMPARISON
+==================================================
+  A (original only):        ERR = 28.87
+  B (wiki pre-train + ft):  ERR = 18.00
+  Improvement:              -10.87
+
+Epoch-by-epoch A: {'checkpoint-3915': 22.038216560509554, 'checkpoint-7830': 26.326963906581742, 'checkpoint-11745': 30.063694267515924, 'checkpoint-15660': 28.832271762208066}
+Epoch-by-epoch B: {'checkpoint-3915': 14.904458598726114, 'checkpoint-7830': 17.70700636942675, 'checkpoint-11745': 18.046709129511676, 'checkpoint-15660': 18.046709129511676}
+
+✅ Results saved to ./experiment_results/
+   Run eval_ko_detail.py for detailed analysis
+(multilexnorm_env) PS C:\Users\kj556\Downloads\multilexnorm> python eval_detail.py
+Loading predictions...
+Total unique words: 9541
+
+✅ Saved to ./experiment_results/comparison.csv
+
+==================================================
+SUMMARY BY LANGUAGE
+==================================================
+
+[de] total=1802, nonstandard=478
+  B_only_correct:    12  ← 증강으로 개선
+  A_only_correct:    82  ← 증강으로 나빠짐
+  both_correct:      40
+  both_wrong:       344
+  B_new_FP:           3  ← 증강 후 과정규화
+  B_fixed_FP:        28  ← 증강 후 FP 수정
+
+[en] total=3890, nonstandard=302
+  B_only_correct:     5  ← 증강으로 개선
+  A_only_correct:    62  ← 증강으로 나빠짐
+  both_correct:      78
+  both_wrong:       157

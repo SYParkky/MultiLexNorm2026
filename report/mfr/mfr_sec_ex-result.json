@@ -1,0 +1,58 @@
+{
+  "overall_err": 45.486014954306285,
+  "params": {
+    "mfr_threshold": 0.15,
+    "conf_threshold": 0.3,
+    "use_mfr": true,
+    "use_conf": true
+  },
+  "group_results": {
+    "germanic": {
+      "err": 31.62754905732974,
+      "langs": [
+        "de",
+        "en",
+        "nl"
+      ]
+    },
+    "slav": {
+      "err": 44.360625574977,
+      "langs": [
+        "hr",
+        "sl",
+        "sr"
+      ]
+    },
+    "sea": {
+      "err": 60.460732984293195,
+      "langs": [
+        "id",
+        "iden",
+        "vi"
+      ]
+    },
+    "ja": {
+      "err": 19.03367496339678,
+      "langs": [
+        "ja"
+      ]
+    },
+    "ko": {
+      "err": 10.843373493975903,
+      "langs": [
+        "ko"
+      ]
+    },
+    "th": {
+      "err": 38.42239185750636,
+      "langs": [
+        "th"
+      ]
+    }
+  },
+  "overall_stats": {
+    "TP": 7311,
+    "FP": 741,
+    "FN": 7133
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "final_err": 3.0120481927710845,
+  "epoch_history": [
+    {
+      "epoch": 1,
+      "err": -2.4096385542168677
+    },
+    {
+      "epoch": 2,
+      "err": -1.2048192771084338
+    },
+    {
+      "epoch": 3,
+      "err": 1.2048192771084338
+    },
+    {
+      "epoch": 4,
+      "err": 3.0120481927710845
+    }
+  ],
+  "lang": "ko",
+  "aug": "./data/youtube_augmented_ko.jsonl",
+  "config": {
+    "lr": 0.0005,
+    "epochs": 4
+  }
+}

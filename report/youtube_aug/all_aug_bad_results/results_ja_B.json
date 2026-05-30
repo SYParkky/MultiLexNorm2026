@@ -1,0 +1,27 @@
+{
+  "final_err": 10.248901903367496,
+  "epoch_history": [
+    {
+      "epoch": 1,
+      "err": 7.320644216691069
+    },
+    {
+      "epoch": 2,
+      "err": 7.906295754026354
+    },
+    {
+      "epoch": 3,
+      "err": 10.102489019033674
+    },
+    {
+      "epoch": 4,
+      "err": 10.248901903367496
+    }
+  ],
+  "lang": "ja",
+  "aug": "./data/youtube_augmented_ja.jsonl",
+  "config": {
+    "lr": 0.0005,
+    "epochs": 4
+  }
+}
