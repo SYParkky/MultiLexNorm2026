@@ -13,7 +13,7 @@ import zipfile
 import json
 
 # ===== 1. Login =====
-login(token=" ")
+login(token="")
 
 # ===== 2. Config =====
 BATCH_SIZE = 256
@@ -153,17 +153,19 @@ for group_name, langs in LANG_GROUPS.items():
     print(f"\n[{group_name}] {model_path}")
     print(f"  {len(indices)} sentences | langs: {langs}")
 
-    # MFR 빌드
-    mfr, mfr_ratio = build_mfr(train_data, langs)
-    print(f"  MFR dict: {len(mfr)} entries")
+    # MFR 빌드 (use_mfr=True인 그룹만)
+    gp = GROUP_POSTPROCESS.get(group_name, {"use_mfr": False, "use_conf": False,
+                                             "mfr_threshold": 0.3, "conf_threshold": 0.5})
+    if gp["use_mfr"]:
+        mfr, mfr_ratio = build_mfr(train_data, langs)
+        print(f"  MFR dict: {len(mfr)} entries")
+    else:
+        mfr, mfr_ratio = None, None
 
     model = T5ForConditionalGeneration.from_pretrained(
         model_path, torch_dtype=torch.bfloat16
     ).to("cuda")
     model.eval()
-
-    gp = GROUP_POSTPROCESS.get(group_name, {"use_mfr": False, "use_conf": False,
-                                             "mfr_threshold": 0.3, "conf_threshold": 0.5})
 
     for i, idx in enumerate(indices):
         ex   = test_list[idx]
